@@ -1,0 +1,7 @@
+%extension%=ini
+;; %theme-name%
+
+[color]
+;; background = %background%
+background = #00000000
+foreground = %background%

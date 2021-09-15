@@ -1,0 +1,30 @@
+background: #212324
+foreground: #b9b9b9
+cursor: #bbbbbb
+selection-background: #2f3333
+selection-foreground: #212324
+
+black: #000000
+black-hg: #000000
+
+red: #e8331c
+red-hg: #df5a4f
+
+green: #68c156
+green-hg: #76b768
+
+yellow: #f1d32b
+yellow-hg: #eed64a
+
+blue: #1c98e8
+blue-hg: #387bd2
+
+magenta: #8e69c8
+magenta-hg: #957bbd
+
+cyan: #1c98e8
+cyan-hg: #3d96e2
+
+white: #b9b9b9
+white-hg: #b9b9b9
+
