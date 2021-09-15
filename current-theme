@@ -1,6 +1,6 @@
-dunstrc: Spacedust
-vscode: Rosé Pine
-wallpaper: ~/.config/gtheme/wallpapers/Rose-Pine/beachhouses.jpg
-kitty: Spacedust
-polybar: Spacedust
-rofi: Spacedust
+dunstrc: Nord
+kitty: Nord
+polybar: Nord
+rofi: Nord
+vscode: Nord
+wallpaper: ~/.config/gtheme/wallpapers/Nord/caravan.png
