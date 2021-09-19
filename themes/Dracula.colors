@@ -1,3 +1,6 @@
+vscode: Dracula
+wallpaper: ~/.config/gtheme/wallpapers/Dracula/arch.png
+
 background: #1e1f28
 foreground: #f8f8f2
 cursor: #bbbbbb
@@ -27,4 +30,3 @@ cyan-hg: #8ae9fc
 
 white: #bbbbbb
 white-hg: #ffffff
-

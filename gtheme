@@ -11,6 +11,7 @@
 GTHEME_PATH=$XDG_CONFIG_HOME/gtheme
 THEMES_PATH=$GTHEME_PATH/themes
 PATTERNS_PATH=$GTHEME_PATH/patterns
+EXTRA_FILES_PATH=$GTHEME_PATH/extra-files
 CURRENT_THEME_FILE=$GTHEME_PATH/current-theme
 
 # •• Global Settings
@@ -18,10 +19,6 @@ SET_WALLPAPER_SCRIPT="$GTHEME_PATH/setwp"
 VSCODE_SETTINGS_FILE="$XDG_CONFIG_HOME/Code/User/settings.json"
 ATTR_NAMES=("background" "foreground" "cursor" "selection-background" "selection-foreground" \
 "black" "black-hg" "red" "red-hg" "green" "green-hg" "yellow" "yellow-hg" "blue" "blue-hg" "magenta" "magenta-hg" "cyan" "cyan-hg" "white" "white-hg")
-
-# Scan first for pattern-like colors.
-# If no one is found and the colors match the current theme applied *on that file* they will be replaced.
-EXTRA_FILES=("$XDG_CONFIG_HOME/dunst/dunstrc")
 
 # •• Colors
 G="\e[1;32m"
@@ -31,83 +28,66 @@ B="\e[1;34m"
 W="\e[0m"
 W_B="\e[1m"
 
-function listThemes() {
-	echo
-	for theme in $(ls $THEMES_PATH); do
-		CONTENT=$(cat $THEMES_PATH/$theme)
-
-		if [ $(readlink $HOME/.config/kitty/theme.conf) == "$THEMES_PATH/$theme" ]; then # Current theme
-			echo -e "${B}->${W} ${B}*${W}${theme::-5}${B}*${W} "
-		else
-			echo -e " ${G}-${W} ${theme::-5} "
-		fi
-	done
-	echo
+trap ctr_c INT
+function trapCtrlC() {
+	echo -e "${R}[!]${W} Exiting...\n"
 }
 
 function helpPanel() {
-	echo -e "\n${Y}[*]${W} Usage: change-theme [OPTION] [THEME]"
+	echo -e "\n${Y}[*]${W} Usage: change-theme [OPTION]"
 	echo -e "\nIt will set the THEME's color schema to kitty, polybar, rofi and dunst.
 More rules can be specified to change the wallpaper, the VSCode color palette, etc..."
 	echo -e "\nOPTIONS:
-  ${G}-h${W}                  Show this panel.
-  ${G}-l${W}                  List all installed themes.
-  ${G}-n <THEME_NAME>${W}     Apply the specified <THEME_NAME>
-
-Note: The default path is $CONFIG_PATH/gtheme/\n"
+  ${G}-p <PATT1,PATT2...>${W}   Apply the theme only on selected patterns. Important: There must be no spaces between the patterns, only commas.
+  ${G}-v${W}                    If -p is specified, apply also the VSCode theme.
+  ${G}-w${W}                    If -p is specified, apply also the wallpaper.
+  ${G}-l${W}                    List all installed themes.
+  ${G}-n <THEME_NAME>${W}       Apply the specified <THEME_NAME>
+  ${G}-h${W}                    Show this panel.\n"
 }
 
+# checkExtraFiles() {
+# 	declare -r NEW_THEME=$1
 
-function applyColors {
-	#----------------------
-	#   CMUS
-	#----------------------
-	CMUSTHEME=$(cat $THEMES_PATH/$THEME.conf | grep CmusTheme | awk -F ': ' '{print $2}')
-	if [ "$CMUSTHEME" != "" ]; then
-		sed -i "s|colorscheme .*|colorscheme themes/$CMUSTHEME|" $CONFIG_PATH/cmus/rc
-		echo -e "${B}->${W} Theme apllied to Cmus"
-	fi	
-}
+# 	for file in $EXTRA_FILES; do
+# 		if [ ! -f $file ]; then
+# 			echo -e "${R}[!]${W} The file ${W_B}$file${W} does not exist!"
+# 			continue
+# 		fi
 
-checkExtraFiles() {
-	NEW_THEME=$1
+# 		echo -e "${B}->${W} Applying $1 theme to $file..."
 
-	for file in $EXTRA_FILES; do
-		if [ ! -f $file ]; then
-			echo -e "${R}[!]${W} The file ${W_B}$file${W} does not exist!"
-			continue
-		fi
+# 		declare CONTENT="$(cat $THEMES_PATH/$NEW_THEME.colors)"
+# 		for attr in ${ATTR_NAMES[@]}; do
+# 			VALUE=$(echo "$CONTENT" | grep -e "^$attr:.*" | awk -F ': ' '{print $2}')
+# 			sed -i "s|%$attr%|$VALUE|g" $file
+# 		done
 
-		FILE_THEME=$(cat $CURRENT_THEME_FILE | grep $(basename $file) | awk -F ': ' '{print $2}')
+# 		if [ ! -z "$FILE_THEME" ]; then
+# 			for attr in ${ATTR_NAMES[@]}; do
+# 				declare prev=$(cat $THEMES_PATH/$FILE_THEME.colors | grep -e "^$attr:.*" | awk -F ': ' '{print $2}')
+# 				declare new=$(cat $THEMES_PATH/$NEW_THEME.colors | grep -e "^$attr:.*" | awk -F ': ' '{print $2}')
+# 				if [ -z "$prev" ]; then
+# 					continue
+# 				fi
+# 				if [ -z "$new" ]; then
+# 					new="%$attr%"
+# 				fi
+# 				sed -i "s/$prev/$new/g" $file
+# 			done
+# 			sed -i "s/$(basename $file): .*/$(basename $file): $NEW_THEME/" $CURRENT_THEME_FILE
 
-		CONTENT="$(cat $THEMES_PATH/$NEW_THEME.colors)"
-		for attr in ${ATTR_NAMES[@]}; do
-			VALUE=$(echo "$CONTENT" | grep -e "^$attr:.*" | awk -F ': ' '{print $2}')
-			sed -i "s|%$attr%|$VALUE|g" $file
-		done
+# 		else
+# 			echo "$(basename $file): $NEW_THEME" >> $CURRENT_THEME_FILE
+# 		fi
 
-		if [ ! -z "$FILE_THEME" ]; then
-			for attr in ${ATTR_NAMES[@]}; do
-				prev=$(cat $THEMES_PATH/$FILE_THEME.colors | grep -e "^$attr:.*" | awk -F ': ' '{print $2}')
-				new=$(cat $THEMES_PATH/$NEW_THEME.colors | grep -e "^$attr:.*" | awk -F ': ' '{print $2}')
-				if [ -z "$prev" ]; then
-					continue
-				fi
-				if [ -z "$new" ]; then
-					new="%$attr%"
-				fi
-				sed -i "s/$prev/$new/g" $file
-			done
-			sed -i "s/$(basename $file): .*/$(basename $file): $NEW_THEME/" $CURRENT_THEME_FILE
-
-		else
-			echo "$(basename $file): $NEW_THEME" >> $CURRENT_THEME_FILE
-		fi
-	done
-}
+# 		echo -e "${B}->${W} Theme applied to ${G}$(basename $file)${W}"
+# 		echo -e "\n---------------------\n"
+# 	done
+# }
 
 function refreshKitty() {
-	DEST=$1
+	declare -r DEST=$1
 
 	kitty @ set-colors --all $DEST &> /dev/null
 	tput sgr0
@@ -115,22 +95,30 @@ function refreshKitty() {
 }
 
 function refreshEnv() {
-	APP_NAME=$1
-	DEST=$2
+	declare -r APP_NAME=$1
+	declare -r DEST=$2
+
+	echo -e "${B}->${W} Executing post-script..."
 
 	case "$APP_NAME" in
 		kitty) refreshKitty $2;;
 		polybar) bspc wm -r;;
+		dunst) pkill dunst;;
 		*) ;;	
 	esac
 }
 
 function setWallpaper() {
-	WALLPAPER=$(cat $THEMES_PATH/$1.colors | grep wallpaper | awk -F ': ' '{print $2}')
+	declare -r WALLPAPER=$(cat $THEMES_PATH/$1.colors | grep wallpaper | awk -F ': ' '{print $2}')
 
-	if [ -z $WALLPAPER ]; then
+	if [ -z "$WALLPAPER" ]; then
 		return
 	fi
+
+	# if [ ! -f $(realpath ~/.config/gtheme/wallpapers/Dracula/arch.png) ]; then
+	# 	echo -e "${R}[!]${W} The file ${W_B}$WALLPAPER${W} does not exist!\n"
+	# 	return
+	# fi
 
 	sed -i "s|.*WALLPAPER_URL=.*|WALLPAPER_URL=$WALLPAPER|" $SET_WALLPAPER_SCRIPT
 	if [ ! -x $SET_WALLPAPER_SCRIPT ]; then
@@ -138,78 +126,111 @@ function setWallpaper() {
 		return
 	fi
 	
-	$SET_WALLPAPER_SCRIPT
-	echo -e "\n${B}[+]${W} Wallapper applied!"
+	if $SET_WALLPAPER_SCRIPT; then
+		echo -e "${B}[+]${W} Wallpaper ${W_B}$(basename $WALLPAPER)${W} applied!\n"
 
-	sed -i "/.*wallpaper.*/d" $CURRENT_THEME_FILE
-	echo -e "wallpaper: $WALLPAPER" >> $CURRENT_THEME_FILE
+		sed -i "/.*wallpaper.*/d" $CURRENT_THEME_FILE
+		echo -e "wallpaper: $WALLPAPER" >> $CURRENT_THEME_FILE
+	else
+		echo -e "${R}[!]${W} There was a error while setting the wallpaper.\n"
+	fi
 }
 
 function setVscodeTheme() {
-	VSCODETHEME=$(cat $THEMES_PATH/$1.colors | grep vscode | awk -F ': ' '{print $2}')
+	declare -r VSCODETHEME=$(cat $THEMES_PATH/$1.colors | grep vscode | awk -F ': ' '{print $2}')
 	if [ -z "$VSCODETHEME" ]; then
 		return
 	fi
 
 	sed -i "s|\"workbench.colorTheme\": \".*\"|\"workbench.colorTheme\": \"$VSCODETHEME\"|" $VSCODE_SETTINGS_FILE
-	echo -e "\n${B}[+]${W} Theme applied to VSCode!"
+	echo -e "${B}[+]${W} Theme ${W_B}\"$VSCODETHEME\"${W} applied to Visual Studio Code!\n"
 
 	sed -i "/.*vscode.*/d" $CURRENT_THEME_FILE
 	echo -e "vscode: $VSCODETHEME" >> $CURRENT_THEME_FILE
 }
 
 function fillPattern() {
-	PATTERN_FP=$PATTERNS_PATH/$1.pattern
+	echo -e "${B}->${W} Generating file for $1..."
 
-	EXTENSION=$(cat $PATTERN_FP | grep %extension% | awk -F '=' '{print $2}')
-	
-	DEST=$HOME/.config/$1/colors.$EXTENSION
+	declare -r PATTERN=$PATTERNS_PATH/$1*
+	declare -r IS_INVERTED=$3
 
-	cp $PATTERN_FP $DEST
+	declare DEST="$(cat $PATTERN | grep -e ".*%output-file%.*" | awk -F '=' '{print $2}')"
+
+	if [ -z "$DEST" ]; then
+		echo -e "${R}[!]${W} No output file found. Using the default path."
+		DEST=$HOME/.config/$1/gtheme-colors
+	fi
+
+	if [ ! -d $(dirname $DEST) ]; then
+		echo -e "${R}[!]${W} The folder ${W_B}$(dirname $DEST)${W} does not exist!\n"
+		return
+	fi
+
+	cp $PATTERN $DEST
 	
-	CONTENT="$(cat $THEMES_PATH/$2.colors)"
+	declare -r CONTENT="$(cat $THEMES_PATH/$2.colors)"
 	for attr in ${ATTR_NAMES[@]}; do
-		VALUE=$(echo "$CONTENT" | grep -e "^$attr:.*" | awk -F ': ' '{print $2}')
+		declare VALUE=$(echo "$CONTENT" | grep -e "^$attr:.*" | awk -F ': ' '{print $2}')
+
+		# Invert colors
+		if [ $IS_INVERTED -eq 1 ]; then
+			if [ "$attr" == "background" ]; then
+				attr="foreground"
+			elif [ "$attr" == "foreground" ]; then
+				attr="background"
+			fi
+		fi
+
 		sed -i "s|%$attr%|$VALUE|g" $DEST
 	done
 
 	sed -i "s|%theme-name%| -------- Theme: $2 --------|" $DEST
-	sed -i 's|.*%extension%.*||' $DEST
+	sed -i "s|.*%output-file%.*||" $DEST
+
+	echo -e "${B}->${W} Created file ${W_B}$(basename $DEST)${W} in ${W_B}$(dirname $DEST)${W}"
 
 	refreshEnv $1 $DEST
 
-	echo -e "${B}->${W} Theme applied to ${G}$1${W}"
+	echo -e "${B}->${W} Theme applied to ${G}$1${W}\n"
+
+	echo -e "---------------------\n"
 }
 
 function generateFiles() {
-	PATTERNS_GF="$1"
-	THEME_NAME_GF="$2"
+	declare PATTERNS="$1"
+	declare -r INVERTED_PATTERNS="$2"
+	declare -r THEME_NAME="$3"
 
-	if [ -z $PATTERNS_GF ]; then
-		PATTERNS_GF="$(ls $PATTERNS_PATH | sed 's/.pattern//g' )"
-	else
-		PATTERNS_GF="$(echo $PATTERNS_GF | sed 's/,/ /g')"
+	if [ -z "$PATTERNS" ]; then
+		PATTERNS="$(ls $PATTERNS_PATH | sed 's/\..*//g' )"
 	fi
-	
+
 	echo
-	for PATTERN_GF in $PATTERNS_GF; do
-		sed -i "/.*$PATTERN_GF.*/d" $CURRENT_THEME_FILE
-		echo -e "$PATTERN_GF: $THEME_NAME_GF" >> $CURRENT_THEME_FILE
+	for PATTERN in $PATTERNS; do
+		sed -i "/.*$PATTERN.*/d" $CURRENT_THEME_FILE
+		echo -e "$PATTERN: $THEME_NAME" >> $CURRENT_THEME_FILE
 
-		fillPattern $PATTERN_GF $THEME_NAME_GF
+		if echo "$INVERTED_PATTERNS" | grep $PATTERN &>/dev/null; then
+			fillPattern $PATTERN $THEME_NAME 1
+		else
+			fillPattern $PATTERN $THEME_NAME 0
+		fi	
 	done
-	
-	setVscodeTheme $THEME_NAME_GF
-	setWallpaper $THEME_NAME_GF
 
-	checkExtraFiles $THEME_NAME_GF
+	# checkExtraFiles $THEME_NAME
 
-	echo -e "\n${G}[+]${W} Theme changed succesfully!\n"
+	if [[ -z "$1" || $IS_VSCODE -eq 1 ]]; then
+		setVscodeTheme $THEME_NAME
+	fi
+	if [[ -z "$1" || $IS_WALLPAPER -eq 1 ]]; then
+		setWallpaper $THEME_NAME
+	fi
 }
 
 function showThemes() {
-	COUNT=0
-	COLOR_SCHEMES=($1)
+	declare -i COUNT=0
+	declare -a COLOR_SCHEMES=($1)
 
 	echo
 	for theme in "${COLOR_SCHEMES[@]}"; do
@@ -218,31 +239,30 @@ function showThemes() {
 		else
 			echo -e "${G}[$COUNT]${W} ${theme::-7} "
 		fi
-		COUNT=$(($COUNT+1))
+		COUNT=$COUNT+1
 	done
+	echo
 
 	return $COUNT
 }
 
 function mainLoop() {
-	PATTERNS="$1"
-	COLOR_SCHEMES=($(ls $THEMES_PATH))
-
-	COLOR_SCHEMES_STRING="${COLOR_SCHEMES[@]}"
+	declare -a COLOR_SCHEMES=($(ls $THEMES_PATH))
+	declare -r COLOR_SCHEMES_STRING="${COLOR_SCHEMES[@]}"
 
 	showThemes "$COLOR_SCHEMES_STRING"
-	TOTAL_THEMES=$?
+	declare -r TOTAL_THEMES=$?
 
 	while true; do
-		echo; read -p "Select a color scheme: (q to quit) " res
+		read -p "Select a color scheme: (q to quit) " res
 
 		if [[ "$res" == "q" || "$res" == "Q" ]]; then
 			exit 0
 		fi
 
 		if [[ (-n "$res") && ("$res" -le $TOTAL_THEMES) ]]; then
-			THEME_NAME=${COLOR_SCHEMES[$res]}
-			generateFiles "$PATTERNS" ${THEME_NAME::-7}
+			declare THEME_NAME=${COLOR_SCHEMES[$res]}
+			generateFiles "$1" "$2" ${THEME_NAME::-7}
 		else
 			echo -e "${R}[!]${W} Invalid option!"
 		fi
@@ -251,31 +271,42 @@ function mainLoop() {
 	done
 }
 
-while getopts "lhn:p:" option; do
-	case $option in
-		l) listThemes; exit 0;;
-		h) helpPanel; exit 0;;
+declare -gi IS_VSCODE=0
+declare -gi IS_WALLPAPER=0
+function main() {
+	while getopts "lhi:n:p:vwe" option; do
+		case $option in
+			l) showThemes "$(ls $THEMES_PATH)"; exit 0;;
+			h) helpPanel; exit 0;;
+			n) declare theme_name=$OPTARG;;
+			p) declare patterns=$OPTARG;;
+			i) declare inverted_patterns=$OPTARG;;
+			v) IS_VSCODE=1;;
+			w) IS_WALLPAPER=1;;
+			*) helpPanel; exit 1;;
+		esac
+	done
+	
+	patterns="$(echo $patterns | sed 's/,/ /g')"
+	inverted_patterns="$(echo $inverted_patterns | sed 's/,/ /g')"
 
-		n) theme_name=$OPTARG;;
-		p) patterns=$OPTARG;;
-		*) helpPanel; exit 1;;
-	esac
-done
+	for pattern in $patterns $inverted_patterns; do
+		if [ ! -f $PATTERNS_PATH/$pattern* ]; then
+			echo -e "\n${R}[!]${W} The pattern ${W_B}$pattern${W} does not exist!\n"
+			exit 0
+		fi
+	done
 
-for pattern in $patterns; do
-	if [ ! -f $PATTERNS_PATH/$pattern.pattern ]; then
-		echo -e "\n${R}[!]${W} The pattern ${W_B}$pattern${W} does not exist!\n"
-		exit 0
+	if [ -z $theme_name ]; then
+		mainLoop "$patterns" "$inverted_patterns"
 	fi
-done
 
-if [ -z $theme_name ]; then
-	mainLoop "$patterns"
-fi
+	if [ ! -f $THEMES_PATH/$theme_name.colors ]; then
+		echo -e "\n${R}[!]${W} The theme ${W_B}$theme_name${W} does not exist!\n"
+		exit 1
+	fi
 
-if [ ! -f $THEMES_PATH/$theme_name.colors ]; then
-	echo -e "\n${R}[!]${W} The theme ${W_B}$theme_name${W} does not exist!\n"
-	exit 1
-fi
+	generateFiles "$patterns" "$inverted_patterns" $theme_name
+}
 
-generateFiles "$patterns" $theme_name
+main $@

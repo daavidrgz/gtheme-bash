@@ -1,9 +1,10 @@
-%extension%=conf
+%output-file%=/home/david/.config/kitty/colors.conf
+
 # %theme-name%
 
 foreground               %foreground%
 background               %background%
-selection_foreground     %foreground%
+selection_foreground     %selection-foreground%
 selection_background     %selection-background%
 
 url_color                %magenta%

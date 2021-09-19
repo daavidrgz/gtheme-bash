@@ -1,3 +1,5 @@
+vscode: Ayu Light
+
 background: #fafafa
 foreground: #5b6673
 cursor: #ff6900
@@ -27,4 +29,3 @@ cyan-hg: #7ff0cb
 
 white: #ffffff
 white-hg: #ffffff
-

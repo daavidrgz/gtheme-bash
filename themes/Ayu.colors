@@ -1,3 +1,5 @@
+vscode: Ayu Dark
+
 background: #0e1419
 foreground: #e5e1cf
 cursor: #f19618
@@ -27,4 +29,3 @@ cyan-hg: #c7fffc
 
 white: #ffffff
 white-hg: #ffffff
-
