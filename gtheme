@@ -11,6 +11,7 @@
 GTHEME_PATH=$XDG_CONFIG_HOME/gtheme
 THEMES_PATH=$GTHEME_PATH/themes
 PATTERNS_PATH=$GTHEME_PATH/patterns
+POSTSCRIPTS_PATH=$GTHEME_PATH/post-scripts
 CURRENT_THEME_FILE=$GTHEME_PATH/current-theme
 
 # •• Global Settings
@@ -46,26 +47,17 @@ More rules can be specified to change the wallpaper, the VSCode color palette, e
   ${G}-h${W}                    Show this panel.\n"
 }
 
-function refreshKitty() {
-	declare -r DEST=$1
-
-	kitty @ set-colors --all $DEST &> /dev/null
-	tput sgr0
-	tput op
-}
-
-function refreshEnv() {
+function executePostScript() {
 	declare -r APP_NAME=$1
-	declare -r DEST=$2
 
 	echo -e "${B}->${W} Executing post-script..."
 
-	case "$APP_NAME" in
-		kitty) refreshKitty $2;;
-		polybar) bspc wm -r;;
-		dunst) pkill dunst;;
-		*) ;;	
-	esac
+	if [ ! -e $POSTSCRIPTS_PATH/$APP_NAME.sh ]; then
+		echo -e "${Y}->${W} No post-script found!"
+		return
+	fi
+
+	$POSTSCRIPTS_PATH/$APP_NAME.sh $2
 }
 
 function setWallpaper() {
@@ -103,7 +95,7 @@ function setVscodeTheme() {
 function fillPattern() {
 	echo -e "${B}->${W} Generating file for $1..."
 
-	declare -r PATTERN=$PATTERNS_PATH/$1*
+	declare -r PATTERN="$PATTERNS_PATH/$1.pattern"
 	declare -r IS_INVERTED=$3
 
 	declare DEST="$(cat $PATTERN | grep -e ".*%output-file%.*" | awk -F '=' '{print $2}')"
@@ -113,7 +105,7 @@ function fillPattern() {
 		DEST=$HOME/.config/$1/gtheme-colors
 	fi
 
-	if [ ! -e $(dirname $DEST) ]; then
+	if [ ! -e "$(dirname $DEST)" ]; then
 		echo -e "${R}[!]${W} The folder ${W_B}$(dirname $DEST)${W} does not exist!\n"
 		return
 	fi
@@ -141,7 +133,7 @@ function fillPattern() {
 
 	echo -e "${B}->${W} Created file ${W_B}$(basename $DEST)${W} in ${W_B}$(dirname $DEST)${W}"
 
-	refreshEnv $1 $DEST
+	executePostScript $1 $DEST
 
 	echo -e "${B}->${W} Theme applied to ${G}$1${W}\n"
 
@@ -157,15 +149,15 @@ function generateFiles() {
 
 	echo
 	for PATTERN in $PATTERNS; do
-		sed -i "/.*$PATTERN.*/d" $CURRENT_THEME_FILE
-		echo -e "$PATTERN: $THEME_NAME" >> $CURRENT_THEME_FILE
-
 		echo "$INVERTED_PATTERNS" | grep $PATTERN &>/dev/null
 		fillPattern $PATTERN $THEME_NAME $?
+
+		sed -i "/$PATTERN:.*/d" $CURRENT_THEME_FILE
+		echo -e "$PATTERN: $THEME_NAME" >> $CURRENT_THEME_FILE
 	done
 
-	([ -z "$1" ] || [ $IS_VSCODE -eq 0 ]) && setVscodeTheme $THEME_NAME
-	([ -z "$1" ] || [ $IS_WALLPAPER -eq 0 ]) && setWallpaper $THEME_NAME
+	[ $IS_VSCODE -eq 0 ] && setVscodeTheme $THEME_NAME
+	[ $IS_WALLPAPER -eq 0 ] && setWallpaper $THEME_NAME
 }
 
 function showThemes() {
@@ -195,9 +187,7 @@ function mainLoop() {
 	while true; do
 		read -p "Select a color scheme: (q to quit) " res
 
-		if [[ "$res" == "q" || "$res" == "Q" ]]; then
-			exit 0
-		fi
+		([ "$res" == "q" ] || [ "$res" == "Q" ]) && ctrl_c
 
 		if [[ ! -n $res || $res -ge $TOTAL_THEMES ]]; then
 			echo -e "\n${R}[!]${W} Invalid option!\n"

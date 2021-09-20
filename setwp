@@ -1,4 +1,4 @@
 #!/bin/sh
 
-WALLPAPER_URL=~/.config/gtheme/wallpapers/Nord/caravan.png
+WALLPAPER_URL=~/.config/gtheme/wallpapers/Rose-Pine/Ashim.jpg
 feh --no-fehbg --bg-fill "$WALLPAPER_URL"
