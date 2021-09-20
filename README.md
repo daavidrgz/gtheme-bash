@@ -2,8 +2,8 @@
 A bash script that makes your theming life so much easier.
 
 ## What is this?
-Based in patterns, Gtheme can generate any file applying one of the more than 200 themes gathered.
 
+Based in patterns, Gtheme can generate any file applying one of the more than 200 themes gathered.  
 Thus, it can create and replace in real time a rofi colors.rasi file, an alacritty.yml file and so much more, leading
 to a global theme change perception that we all really need.
 
@@ -13,9 +13,19 @@ It also supports:
 * Changing the Visual Studio Code theme.
 
 ## Wiki
+
 ### Patterns
-All the patterns are stored in the folder `patterns/` with the `.pattern` extension.
-Available keys: `%background%` `%foreground%` `%cursor%` `%selection-background%` `%selection-foreground%` `%black%` `%black-hg%` `%red%` `%red-hg%` `%green%` `%green-hg%` `%yellow%` `%yellow-hg%` `%blue%` `%blue-hg%` `%magenta%` `%magenta-hg%` `%cyan%` `%cyan-hg%` `%white%` `%white-hg%`
+
+All the patterns are stored in the `patterns/` folder with the `.pattern` extension.
+
+> ***Mandatory key***: `%output-file%=/output/file/path`  
+It's required to know where to place the file generated, its name and extension.
+
+Available keys: `%background%` `%foreground%` `%cursor%` `%selection-background%` `%selection-foreground%` `%black%` `%black-hg%` `%red%` `%red-hg%` `%green%` `%green-hg%` `%yellow%` `%yellow-hg%` `%blue%` `%blue-hg%` `%magenta%` `%magenta-hg%` `%cyan%` `%cyan-hg%` `%white%` `%white-hg%`.
+
+The program will scan the pattern file and replace the keys with the associated color in the theme.<sup>[1](#no_color)</sup>
+
+
 
 The created file path is sent to all the post-scripts as the first argument (see [kitty.sh](https://github.com/daavidrgz/gtheme/tree/master/post-scripts/kitty.sh)).
 
@@ -27,3 +37,7 @@ Wallpaper repositories:
 * https://github.com/linuxdotexe/nordic-wallpapers
 * https://github.com/dracula/wallpaper
 * https://gitlab.com/exorcist365/wallpapers
+
+## Foot Notes
+
+<a name="no_color">1.</a> - If there is no color associated to a key in a theme, it will be replaced with an empty string in the output file.
