@@ -12,6 +12,13 @@ It also supports:
 * Changing the wallpaper to match your new color scheme.
 * Changing the Visual Studio Code theme.
 
+## Wiki
+### Patterns
+All the patterns are stored in the folder `patterns/` with the `.pattern` extension.
+Available keys: `%background%` `%foreground%` `%cursor%` `%selection-background%` `%selection-foreground%` `%black%` `%black-hg%` `%red%` `%red-hg%` `%green%` `%green-hg%` `%yellow%` `%yellow-hg%` `%blue%` `%blue-hg%` `%magenta%` `%magenta-hg%` `%cyan%` `%cyan-hg%` `%white%` `%white-hg%`
+
+The created file path is sent to all the post-scripts as the first argument (see [kitty.sh](https://github.com/daavidrgz/gtheme/tree/master/post-scripts/kitty.sh)).
+
 ## Credits
 
 Wallpaper repositories:
