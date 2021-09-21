@@ -1,4 +1,0 @@
-#!/bin/sh
-
-WALLPAPER_URL=~/.config/gtheme/wallpapers/Gruvbox/light-archlinux.png
-feh --no-fehbg --bg-fill "$WALLPAPER_URL"

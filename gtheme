@@ -15,7 +15,7 @@ POSTSCRIPTS_PATH=$GTHEME_PATH/post-scripts
 CURRENT_THEME_FILE=$GTHEME_PATH/current-theme
 
 # •• Global Settings
-SET_WALLPAPER_SCRIPT="$GTHEME_PATH/setwp"
+SET_WALLPAPER_SCRIPT="$POSTSCRIPTS_PATH/wallpaper.sh"
 VSCODE_SETTINGS_FILE="$XDG_CONFIG_HOME/Code/User/settings.json"
 ATTR_NAMES=("background" "foreground" "cursor" "selection-background" "selection-foreground" \
 "black" "black-hg" "red" "red-hg" "green" "green-hg" "yellow" "yellow-hg" "blue" "blue-hg" "magenta" "magenta-hg" "cyan" "cyan-hg" "white" "white-hg")
@@ -35,16 +35,16 @@ function ctrl_c() {
 }
 
 function helpPanel() {
-	echo -e "\n${Y}[*]${W} Usage: change-theme [OPTION]"
-	echo -e "\nIt will set the THEME's color schema to kitty, polybar, rofi and dunst.
-More rules can be specified to change the wallpaper, the VSCode color palette, etc..."
+	echo -e "\n${Y}[*]${W} Usage: gtheme [OPTIONS...]"
+
 	echo -e "\nOPTIONS:
-  ${G}-p <PATT1,PATT2...>${W}   Apply the theme only on selected patterns. Important: There must be no spaces between the patterns, only commas.
-  ${G}-v${W}                    If -p is specified, apply also the VSCode theme.
-  ${G}-w${W}                    If -p is specified, apply also the wallpaper.
-  ${G}-l${W}                    List all installed themes.
-  ${G}-n <THEME_NAME>${W}       Apply the specified <THEME_NAME>
-  ${G}-h${W}                    Show this panel.\n"
+  ${G}-p <PATT1,PATT2...>${W} - Apply the theme only on selected patterns. Important: There must be no spaces between the patterns, only commas.
+  ${G}-i <PATT1,PATT2...>${W} - Invert the background and the foreground colors on selected patterns.
+  ${G}-n <THEME_NAME>${W} ----- Apply the specified <THEME_NAME>
+  ${G}-v${W} ------------------ Apply the VSCode theme.
+  ${G}-w${W} ------------------ Apply the wallpaper.
+  ${G}-l${W} ------------------ List all installed themes.
+  ${G}-h${W} ------------------ Show this panel.\n"
 }
 
 function executePostScript() {
