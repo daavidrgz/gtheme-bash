@@ -11,6 +11,7 @@
 GTHEME_PATH=$XDG_CONFIG_HOME/gtheme
 THEMES_PATH=$GTHEME_PATH/themes
 PATTERNS_PATH=$GTHEME_PATH/patterns
+ACTIVE_PATTERNS_PATH=$GTHEME_PATH/patterns/active-patterns
 POSTSCRIPTS_PATH=$GTHEME_PATH/post-scripts
 CURRENT_THEME_FILE=$GTHEME_PATH/current-theme
 
@@ -21,8 +22,8 @@ ATTR_NAMES=("background" "foreground" "cursor" "selection-background" "selection
 "black" "black-hg" "red" "red-hg" "green" "green-hg" "yellow" "yellow-hg" "blue" "blue-hg" "magenta" "magenta-hg" "cyan" "cyan-hg" "white" "white-hg")
 
 # •• Colors
-G="\e[1;32m"
 R="\e[1;31m"
+G="\e[1;32m"
 Y="\e[1;33m"
 B="\e[1;34m"
 W="\e[0m"
@@ -38,13 +39,15 @@ function helpPanel() {
 	echo -e "\n${Y}[*]${W} Usage: gtheme [OPTIONS...]"
 
 	echo -e "\nOPTIONS:
-  ${G}-p <PATT1,PATT2...>${W} - Apply the theme only on selected patterns. Important: There must be no spaces between the patterns, only commas.
-  ${G}-i <PATT1,PATT2...>${W} - Invert the background and the foreground colors on selected patterns.
-  ${G}-n <THEME_NAME>${W} ----- Apply the specified <THEME_NAME>
-  ${G}-v${W} ------------------ Apply the VSCode theme.
-  ${G}-w${W} ------------------ Apply the wallpaper.
-  ${G}-l${W} ------------------ List all installed themes.
-  ${G}-h${W} ------------------ Show this panel.\n"
+  ${G}-a${W} <PATT1,PATT2...>     activate selected patterns.
+  ${G}-r${W} <PATT1,PATT2...>     desactivate selected patterns.
+  ${G}-p${W} <PATT1,PATT2...>     apply the theme only on selected patterns. Important: There must be no spaces between the patterns, only commas.
+  ${G}-i${W} <PATT1,PATT2...>     invert the background and the foreground colors on selected patterns.
+  ${G}-n${W} <THEME_NAME>         apply the specified <THEME_NAME>
+  ${G}-l${W} themes/patterns      list all installed themes/patterns.
+  ${G}-v${W}                      apply the VSCode theme.
+  ${G}-w${W}                      apply the wallpaper.
+  ${G}-h${W}                      show this panel.\n"
 }
 
 function executePostScript() {
@@ -95,7 +98,7 @@ function setVscodeTheme() {
 function fillPattern() {
 	echo -e "${B}->${W} Generating file for $1..."
 
-	declare -r PATTERN="$PATTERNS_PATH/$1.pattern"
+	declare -r PATTERN="$ACTIVE_PATTERNS_PATH/$1.pattern"
 	declare -r IS_INVERTED=$3
 
 	declare DEST="$(cat $PATTERN | grep -e ".*%output-file%.*" | awk -F '=' '{print $2}')"
@@ -145,7 +148,7 @@ function generateFiles() {
 	declare -r INVERTED_PATTERNS="$2"
 	declare -r THEME_NAME="$3"
 
-	[ -z "$PATTERNS" ] && PATTERNS="$(ls $PATTERNS_PATH | sed 's/\..*//g' )"
+	[ -z "$PATTERNS" ] && PATTERNS="$(ls -p $ACTIVE_PATTERNS_PATH | grep -v / | sed 's/\..*//g' )"
 
 	echo
 	for PATTERN in $PATTERNS; do
@@ -160,6 +163,20 @@ function generateFiles() {
 	[ $IS_WALLPAPER -eq 0 ] && setWallpaper $THEME_NAME
 }
 
+function showPatterns() {
+	declare -a PATTERNS=($@)
+
+	echo
+	for pattern in "${PATTERNS[@]}"; do
+		if [ -e $ACTIVE_PATTERNS_PATH/$pattern ]; then
+			printf "${G}->${W} %-20s ${B}Active${W}\n" "${pattern::-8}"
+		else
+			printf "${G}->${W} %-20s ${Y}Not active${W}\n" "${pattern::-8}"
+		fi
+	done
+	echo
+}
+
 function showThemes() {
 	declare -i COUNT=0
 	declare -a COLOR_SCHEMES=($@)
@@ -167,7 +184,7 @@ function showThemes() {
 	echo
 	for theme in "${COLOR_SCHEMES[@]}"; do
 		if cat $CURRENT_THEME_FILE | grep -e ": ${theme::-7}$" &>/dev/null; then
-			echo -e "${B}[$COUNT]${W} ${B}*${W}${theme::-7}${B}*${W} "
+			echo -e "${B}[$COUNT]${W} ${theme::-7} ${B}(active)${W}"
 		else
 			echo -e "${G}[$COUNT]${W} ${theme::-7} "
 		fi
@@ -176,6 +193,14 @@ function showThemes() {
 	echo
 
 	return $COUNT
+}
+
+function list() {
+	case "$1" in
+		"themes") showThemes "$(ls -p $THEMES_PATH | grep -v /)"; exit 0;;
+		"patterns") showPatterns "$(ls -p $PATTERNS_PATH | grep -v /)"; exit 0;;
+		*) echo -e "\n${R}[!]${W} Invalid option ${W_B}$1${W}!\n"; exit 1;;
+	esac
 }
 
 function mainLoop() {
@@ -201,13 +226,70 @@ function mainLoop() {
 	done
 }
 
+function addPatterns() {
+	declare -a ADD_PATTERNS=($@)
+	checkPatterns "$@"
+
+	echo
+	for pattern in ${ADD_PATTERNS[@]}; do
+		if [ -e $ACTIVE_PATTERNS_PATH/$pattern.pattern ]; then
+			echo -e "${Y}[!]${W} The pattern ${W_B}$pattern${W} is already active!\n"
+			continue
+		fi
+
+		echo -e "${Y}->${W} Creating symlink ${W_B}$ACTIVE_PATTERNS_PATH/$pattern.pattern${W}..."
+		if ln -s ../$pattern.pattern $ACTIVE_PATTERNS_PATH/$pattern.pattern; then
+			echo -e "${G}->${W} Pattern ${W_B}$pattern${W} succesfully activated!\n"
+		else
+			echo -e "${R}->${W} Error while activating the pattern $pattern!\n"
+		fi
+	done
+
+	exit 0
+}
+
+function removePatterns() {
+	declare -a REMOVE_PATTERNS=($@)
+	checkPatterns "$@"
+
+	echo
+	for pattern in ${REMOVE_PATTERNS[@]}; do
+		if [ ! -e $ACTIVE_PATTERNS_PATH/$pattern.pattern ]; then
+			echo -e "${Y}[!]${W} The pattern ${W_B}$pattern${W} is already inactive!\n"
+			continue
+		fi
+
+		echo -e "${Y}->${W} Deleting symlink ${W_B}$ACTIVE_PATTERNS_PATH/$pattern.pattern${W}..."
+		if rm $ACTIVE_PATTERNS_PATH/$pattern.pattern; then
+			echo -e "${G}->${W} Pattern ${W_B}$pattern${W} succesfully desactivated!\n"
+		else
+			echo -e "${R}->${W} Error while desactivating the pattern $pattern!\n"
+		fi
+	done
+
+	exit 0;
+}
+
+function checkPatterns() {
+	declare -a PATTERNS=($@)
+
+	for pattern in ${PATTERNS[@]}; do
+		if [ ! -e $PATTERNS_PATH/$pattern.pattern ]; then
+			echo -e "\n${R}[!]${W} The pattern ${W_B}$pattern${W} does not exist!\n"
+			exit 1
+		fi
+	done
+}
+
 declare -gi IS_VSCODE=1
 declare -gi IS_WALLPAPER=1
 function main() {
-	while getopts "lhi:n:p:vwe" option; do
+	while getopts "l:hi:n:p:vwa:r:" option; do
 		case $option in
-			l) showThemes "$(ls $THEMES_PATH)"; exit 0;;
+			l) list $OPTARG;;
 			h) helpPanel; exit 0;;
+			a) addPatterns "$(echo $OPTARG | sed 's/,/ /g')";;
+			r) removePatterns "$(echo $OPTARG | sed 's/,/ /g')";;
 			n) declare theme_name=$OPTARG;;
 			p) declare patterns=$OPTARG;;
 			i) declare inverted_patterns=$OPTARG;;
@@ -219,13 +301,7 @@ function main() {
 	
 	patterns="$(echo $patterns | sed 's/,/ /g')"
 	inverted_patterns="$(echo $inverted_patterns | sed 's/,/ /g')"
-
-	for pattern in $patterns $inverted_patterns; do
-		if [ ! -e $PATTERNS_PATH/$pattern* ]; then
-			echo -e "\n${R}[!]${W} The pattern ${W_B}$pattern${W} does not exist!\n"
-			exit 1
-		fi
-	done
+	checkPatterns "$patterns $inverted_patterns"
 
 	[ -z $theme_name ] && mainLoop "$patterns" "$inverted_patterns"
 
