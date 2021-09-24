@@ -1,0 +1,30 @@
+background: 0xe8e9ec
+foreground: 0x33374c
+cursor: 
+selection-background: 0x33374c
+selection-foreground: 
+
+black: 0xdcdfe7
+black-hg: 0x8389a3
+
+red: 0xcc517a
+red-hg: 0xcc3768
+
+green: 0x668e3d
+green-hg: 0x598030
+
+yellow: 0xc57339
+yellow-hg: 0xb6662d
+
+blue: 0x2d539e
+blue-hg: 0x22478e
+
+magenta: 0x7759b4
+magenta-hg: 0x6845ad
+
+cyan: 0x3f83a6
+cyan-hg: 0x327698
+
+white: 0x33374c
+white-hg: 0x262a3f
+

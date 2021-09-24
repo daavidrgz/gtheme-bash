@@ -1,30 +1,30 @@
 background: #000000
-foreground: #f1f1f1
-cursor: #7f7f7f
-selection-background: #b4d5ff
-selection-foreground: #000000
+foreground: #ffffff
+cursor: #ffffff
+selection-background: #ffffff
+selection-foreground: #ffffff
 
-black: #4f4f4f
-black-hg: #7b7b7b
+black: #4e4e4e
+black-hg: #7c7c7c
 
-red: #fa6c5f
-red-hg: #fcb6af
+red: #ff6c60
+red-hg: #ffb6b0
 
-green: #a8fe60
+green: #a8ff60
 green-hg: #ceffab
 
-yellow: #fffeb6
-yellow-hg: #fffecc
+yellow: #ffffb6
+yellow-hg: #ffffcb
 
-blue: #96cafd
+blue: #96cbfe
 blue-hg: #b5dcfe
 
-magenta: #fa72fc
-magenta-hg: #fb9bfe
+magenta: #ff73fd
+magenta-hg: #ff9cfe
 
-cyan: #c6c4fd
-cyan-hg: #dfdffd
+cyan: #c6c5fe
+cyan-hg: #dfdffe
 
-white: #eeedee
-white-hg: #fefffe
+white: #eeeeee
+white-hg: #ffffff
 

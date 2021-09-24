@@ -3,7 +3,7 @@ A bash script that makes your theming life so much easier.
 
 ## What is this?
 
-Based in patterns, Gtheme can generate any file applying one of the more than 200 themes gathered.  
+Based in patterns, Gtheme can generate any file applying one of the more than 350 themes gathered.  
 Thus, it can create and replace in real time a rofi colors.rasi file, an alacritty.yml file and so much more, leading
 to a global theme change perception that we all really need.
 

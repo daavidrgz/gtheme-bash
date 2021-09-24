@@ -192,7 +192,7 @@ function showThemes() {
 	done
 	echo
 
-	return $COUNT
+	TOTAL_THEMES=$COUNT
 }
 
 function list() {
@@ -206,8 +206,8 @@ function list() {
 function mainLoop() {
 	declare -a COLOR_SCHEMES=($(ls $THEMES_PATH))
 
+	declare -g TOTAL_THEMES
 	showThemes ${COLOR_SCHEMES[@]}
-	declare -r TOTAL_THEMES=$?
 
 	while true; do
 		read -p "Select a color scheme: (q to quit) " res
