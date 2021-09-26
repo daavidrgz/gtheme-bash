@@ -1,5 +1,7 @@
 #!/bin/bash
 
-killall -q polybar
-while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done
-polybar -r -q main -c $XDG_CONFIG_HOME/polybar/custom/config.ini &
+while pgrep -u $UID -x polybar >/dev/null; do
+	killall -q polybar
+	sleep 1
+done
+polybar -r -q main -c $HOME/.config/polybar/config.ini &

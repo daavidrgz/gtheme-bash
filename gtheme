@@ -6,7 +6,7 @@
 # ██║   ██║   ██║   ██╔══██║██╔══╝  ██║╚██╔╝██║██╔══╝  
 # ╚██████╔╝   ██║   ██║  ██║███████╗██║ ╚═╝ ██║███████╗
 #  ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝
-
+# @daavidrgz
 
 GTHEME_PATH=$XDG_CONFIG_HOME/gtheme
 THEMES_PATH=$GTHEME_PATH/themes
@@ -14,6 +14,7 @@ PATTERNS_PATH=$GTHEME_PATH/patterns
 ACTIVE_PATTERNS_PATH=$GTHEME_PATH/patterns/active-patterns
 POSTSCRIPTS_PATH=$GTHEME_PATH/post-scripts
 CURRENT_THEME_FILE=$GTHEME_PATH/current-theme
+FAV_THEMES_FILE=$GTHEME_PATH/fav-themes
 
 # •• Global Settings
 SET_WALLPAPER_SCRIPT="$POSTSCRIPTS_PATH/wallpaper.sh"
@@ -37,26 +38,27 @@ function ctrl_c() {
 
 function helpPanel() {
 	echo -e "\n${Y}[*]${W} Usage: gtheme [OPTIONS...]"
-
+  echo -e "\nIf ${W_B}the flag -p isn't passed${W}, the choosed theme will be applied to ${W_B}all active patterns${W} by default."
 	echo -e "\nOPTIONS:
-  ${G}-a${W} <PATT1,PATT2...>     activate selected patterns.
-  ${G}-r${W} <PATT1,PATT2...>     desactivate selected patterns.
-  ${G}-p${W} <PATT1,PATT2...>     apply the theme only on selected patterns. Important: There must be no spaces between the patterns, only commas.
-  ${G}-i${W} <PATT1,PATT2...>     invert the background and the foreground colors on selected patterns.
-  ${G}-n${W} <THEME_NAME>         apply the specified <THEME_NAME>
-  ${G}-l${W} themes/patterns      list all installed themes/patterns.
-  ${G}-v${W}                      apply the VSCode theme.
-  ${G}-w${W}                      apply the wallpaper.
-  ${G}-h${W}                      show this panel.\n"
+  ${G}-a${W} <PATT1,PATT2...>       activate selected patterns.
+  ${G}-r${W} <PATT1,PATT2...>       desactivate selected patterns.
+  ${G}-p${W} <PATT1,PATT2...>       apply the theme only on selected patterns. Important: There must be no spaces between the patterns, only commas.
+  ${G}-i${W} <PATT1,PATT2...>       invert the background and the foreground colors on selected patterns.
+  ${G}-n${W} <THEME>                apply the specified <THEME>.
+  ${G}-f${W} <THEME1,THEME2...>     flag selected themes as favourite or unflag them if they're already in the fav-themes file.
+  ${G}-l${W} themes|patterns|favs   list all installed themes, patterns or favourite themes.
+  ${G}-v${W}                        apply the VSCode theme.
+  ${G}-w${W}                        apply the wallpaper.
+  ${G}-h${W}                        show this panel.\n"
 }
 
 function executePostScript() {
 	declare -r APP_NAME=$1
 
-	echo -e "${B}->${W} Executing post-script..."
+	echo -e "${B}•${W} Executing post-script..."
 
 	if [ ! -e $POSTSCRIPTS_PATH/$APP_NAME.sh ]; then
-		echo -e "${Y}->${W} No post-script found!"
+		echo -e "${Y}•${W} No post-script found!"
 		return
 	fi
 
@@ -96,7 +98,7 @@ function setVscodeTheme() {
 }
 
 function fillPattern() {
-	echo -e "${B}->${W} Generating file for $1..."
+	echo -e "${B}•${W} Generating file for $1..."
 
 	declare -r PATTERN="$ACTIVE_PATTERNS_PATH/$1.pattern"
 	declare -r IS_INVERTED=$3
@@ -134,11 +136,11 @@ function fillPattern() {
 	sed -i "s|%theme-name%| -------- Theme: $2 --------|" $DEST
 	sed -i "s|.*%output-file%.*||" $DEST
 
-	echo -e "${B}->${W} Created file ${W_B}$(basename $DEST)${W} in ${W_B}$(dirname $DEST)${W}"
+	echo -e "${B}•${W} Created file ${W_B}$(basename $DEST)${W} in ${W_B}$(dirname $DEST)${W}"
 
 	executePostScript $1 $DEST
 
-	echo -e "${B}->${W} Theme applied to ${G}$1${W}\n"
+	echo -e "${B}•${W} Theme applied to ${G}$1${W}\n"
 
 	echo -e "---------------------\n"
 }
@@ -169,9 +171,9 @@ function showPatterns() {
 	echo
 	for pattern in "${PATTERNS[@]}"; do
 		if [ -e $ACTIVE_PATTERNS_PATH/$pattern ]; then
-			printf "${G}->${W} %-20s ${B}Active${W}\n" "${pattern::-8}"
+			printf "${G}•${W} %-20s ${B}Active${W}\n" "${pattern::-8}"
 		else
-			printf "${G}->${W} %-20s ${Y}Not active${W}\n" "${pattern::-8}"
+			printf "${G}•${W} %-20s ${Y}Not active${W}\n" "${pattern::-8}"
 		fi
 	done
 	echo
@@ -183,10 +185,15 @@ function showThemes() {
 
 	echo
 	for theme in "${COLOR_SCHEMES[@]}"; do
+		declare FAV_COLOR=${W}
+		if cat $FAV_THEMES_FILE | grep ${theme::-7} &>/dev/null; then
+			FAV_COLOR=${Y}
+		fi
+
 		if cat $CURRENT_THEME_FILE | grep -e ": ${theme::-7}$" &>/dev/null; then
-			echo -e "${B}[$COUNT]${W} ${theme::-7} ${B}(active)${W}"
+			printf "${B}%7s${W} ${FAV_COLOR}%s ${B}(active)${W}\n" "[$COUNT]" "• ${theme::-7}"
 		else
-			echo -e "${G}[$COUNT]${W} ${theme::-7} "
+			printf "${G}%7s${W} ${FAV_COLOR}%s${W}\n" "[$COUNT]" "• ${theme::-7}"
 		fi
 		COUNT=$COUNT+1
 	done
@@ -195,10 +202,19 @@ function showThemes() {
 	TOTAL_THEMES=$COUNT
 }
 
+function showFavThemes() {
+	echo
+	for theme in $(cat $FAV_THEMES_FILE); do
+		echo -e "${Y}•${W} $theme"
+	done
+	echo
+}
+
 function list() {
 	case "$1" in
 		"themes") showThemes "$(ls -p $THEMES_PATH | grep -v /)"; exit 0;;
 		"patterns") showPatterns "$(ls -p $PATTERNS_PATH | grep -v /)"; exit 0;;
+		"favs") showFavThemes; exit 0;;
 		*) echo -e "\n${R}[!]${W} Invalid option ${W_B}$1${W}!\n"; exit 1;;
 	esac
 }
@@ -226,6 +242,24 @@ function mainLoop() {
 	done
 }
 
+function flagAsFavourite() {
+	declare -a FAV_THEMES=($@)
+	checkThemes "$@" 
+
+	echo
+	for theme in ${FAV_THEMES[@]}; do
+		if cat $FAV_THEMES_FILE | grep $theme &>/dev/null; then
+			sed -i "/$theme/d" $FAV_THEMES_FILE
+			echo -e "${G}[-]${W} Theme ${W_B}$theme${W} succesfully removed from favourites!\n"
+		else
+			echo $theme >> $FAV_THEMES_FILE
+			echo -e "${G}[+]${W} Theme ${W_B}$theme${W} succesfully added to favourites!\n"
+		fi
+	done
+
+	exit 0
+}
+
 function addPatterns() {
 	declare -a ADD_PATTERNS=($@)
 	checkPatterns "$@"
@@ -237,11 +271,11 @@ function addPatterns() {
 			continue
 		fi
 
-		echo -e "${Y}->${W} Creating symlink ${W_B}$ACTIVE_PATTERNS_PATH/$pattern.pattern${W}..."
+		echo -e "${Y}•${W} Creating symlink ${W_B}$ACTIVE_PATTERNS_PATH/$pattern.pattern${W}..."
 		if ln -s ../$pattern.pattern $ACTIVE_PATTERNS_PATH/$pattern.pattern; then
-			echo -e "${G}->${W} Pattern ${W_B}$pattern${W} succesfully activated!\n"
+			echo -e "${G}•${W} Pattern ${W_B}$pattern${W} succesfully activated!\n"
 		else
-			echo -e "${R}->${W} Error while activating the pattern $pattern!\n"
+			echo -e "${R}•${W} Error while activating the pattern $pattern!\n"
 		fi
 	done
 
@@ -259,11 +293,11 @@ function removePatterns() {
 			continue
 		fi
 
-		echo -e "${Y}->${W} Deleting symlink ${W_B}$ACTIVE_PATTERNS_PATH/$pattern.pattern${W}..."
+		echo -e "${Y}•${W} Deleting symlink ${W_B}$ACTIVE_PATTERNS_PATH/$pattern.pattern${W}..."
 		if rm $ACTIVE_PATTERNS_PATH/$pattern.pattern; then
-			echo -e "${G}->${W} Pattern ${W_B}$pattern${W} succesfully desactivated!\n"
+			echo -e "${G}•${W} Pattern ${W_B}$pattern${W} succesfully desactivated!\n"
 		else
-			echo -e "${R}->${W} Error while desactivating the pattern $pattern!\n"
+			echo -e "${R}•${W} Error while desactivating the pattern $pattern!\n"
 		fi
 	done
 
@@ -281,15 +315,27 @@ function checkPatterns() {
 	done
 }
 
+function checkThemes() {
+	declare -a THEMES=($@)
+
+	for theme in ${THEMES[@]}; do
+		if [ ! -e $THEMES_PATH/$theme.colors ]; then
+			echo -e "\n${R}[!]${W} The theme ${W_B}$theme${W} does not exist!\n"
+			exit 1
+		fi
+	done
+}
+
 declare -gi IS_VSCODE=1
 declare -gi IS_WALLPAPER=1
 function main() {
-	while getopts "l:hi:n:p:vwa:r:" option; do
+	while getopts "l:hi:n:p:vwa:r:f:" option; do
 		case $option in
 			l) list $OPTARG;;
 			h) helpPanel; exit 0;;
 			a) addPatterns "$(echo $OPTARG | sed 's/,/ /g')";;
 			r) removePatterns "$(echo $OPTARG | sed 's/,/ /g')";;
+			f) flagAsFavourite "$(echo $OPTARG | sed 's/,/ /g')";;
 			n) declare theme_name=$OPTARG;;
 			p) declare patterns=$OPTARG;;
 			i) declare inverted_patterns=$OPTARG;;

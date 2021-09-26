@@ -1,8 +1,11 @@
+vscode: Iceberg
+wallpaper: ~/.config/gtheme/wallpapers/Iceberg/snow-mountain.jpg
+
 background: #161821
 foreground: #d2d4de
-cursor: 
+cursor: #d2d4de
 selection-background: #d2d4de
-selection-foreground: 
+selection-foreground: #161621
 
 black: #161821
 black-hg: #6b7089
@@ -27,4 +30,3 @@ cyan-hg: #95c4ce
 
 white: #c6c8d1
 white-hg: #d2d4de
-

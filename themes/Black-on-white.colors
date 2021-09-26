@@ -1,8 +1,10 @@
+vscode: White
+
 background: #FFFFFF
 foreground: #000000
-cursor: 
-selection-background: 
-selection-foreground: 
+cursor: #000000
+selection-background: #000000
+selection-foreground: #FFFFFF
 
 black: #000000
 black-hg: #000000

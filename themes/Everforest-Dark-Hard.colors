@@ -3,7 +3,7 @@ wallpaper: ~/.config/gtheme/wallpapers/Everforest/forest.jpg
 
 background: #2b3339
 foreground: #d3c6aa
-cursor: 
+cursor: #d3c6aa
 selection-background: #d3c6aa
 selection-foreground: 
 
