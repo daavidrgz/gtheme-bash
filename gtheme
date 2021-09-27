@@ -75,7 +75,7 @@ function setWallpaper() {
 		echo -e "\n${Y}[!]${W} $SET_WALLPAPER_SCRIPT is not executable. Run chmod +x $SET_WALLPAPER_SCRIPT to solve it"
 		return
 	fi
-	
+
 	if $SET_WALLPAPER_SCRIPT; then
 		echo -e "${B}[+]${W} Wallpaper ${W_B}$(basename $WALLPAPER)${W} applied!\n"
 
@@ -171,9 +171,9 @@ function showPatterns() {
 	echo
 	for pattern in "${PATTERNS[@]}"; do
 		if [ -e $ACTIVE_PATTERNS_PATH/$pattern ]; then
-			printf "${G}•${W} %-20s ${B}Active${W}\n" "${pattern::-8}"
+			printf "${B}•${W} %-20s ${B}Active${W}\n" "${pattern::-8}"
 		else
-			printf "${G}•${W} %-20s ${Y}Not active${W}\n" "${pattern::-8}"
+			printf "${Y}•${W} %-20s ${Y}Not active${W}\n" "${pattern::-8}"
 		fi
 	done
 	echo
@@ -186,7 +186,7 @@ function showThemes() {
 	echo
 	for theme in "${COLOR_SCHEMES[@]}"; do
 		declare FAV_COLOR=${W}
-		if cat $FAV_THEMES_FILE | grep ${theme::-7} &>/dev/null; then
+		if cat $FAV_THEMES_FILE | grep -e "^${theme::-7}$" &>/dev/null; then
 			FAV_COLOR=${Y}
 		fi
 
@@ -359,4 +359,4 @@ function main() {
 	generateFiles "$patterns" "$inverted_patterns" $theme_name
 }
 
-main $@
+main "$@"

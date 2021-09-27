@@ -9,8 +9,12 @@ to a global theme change perception that we all really need.
 
 It also supports:
 * Executing a post script to, for example, reset the dunst notification daemon or refresh the terminal colors with tput.
-* Changing the wallpaper to match your new color scheme.
+* Changing the wallpaper to match your new color scheme (**wallpaper collection included** 😉).
 * Changing the Visual Studio Code theme.
+
+
+![Gif](screenshots/gif.gif)
+
 
 ***
 
