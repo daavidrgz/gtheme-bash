@@ -1,4 +1,4 @@
-# Gtheme
+# Gtheme 🎨
 A bash script that makes your theming life so much easier.
 
 ## What is this?
