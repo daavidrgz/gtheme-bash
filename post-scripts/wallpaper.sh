@@ -1,6 +1,6 @@
 #!/bin/sh
 
-WALLPAPER_URL=~/.config/gtheme/wallpapers/Black-On-White/city.jpg
+WALLPAPER_URL=~/.config/gtheme/wallpapers/Everforest/forest.jpg
 feh --no-fehbg --bg-fill "$WALLPAPER_URL"
 
 # Flag to not execute the dm wallpaper update after every boot
