@@ -6,7 +6,7 @@
 // ╚═╝╚═╝╝╚╝ ╩ ╚═╝ 
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;700&display=swap');
+@import url('assets/fonts/open-sans.css');
 
 /* V A R I A B L E S */
 
@@ -63,6 +63,7 @@
   box-sizing: border-box;
   font-family: 'Open Sans', sans-serif;
   transition: 0.15s ease-in-out;
+  user-select: none;
 }
 
 .notransition {
@@ -302,7 +303,7 @@ body {
   background-color: var(--accent);
 }
 .buttonLink__link:hover svg {
-  stroke: var(--sfg);
+  stroke: var(--bg);
 }
 
 .list {
@@ -339,7 +340,7 @@ body {
 }
 .list__link:hover {
   background-color: var(--accent);
-  color: var(--sfg);
+  color: var(--bg);
   
 }
 

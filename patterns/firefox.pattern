@@ -9,20 +9,11 @@
 └  └─┘┴ └─
 
 by Miguel Avila
-
-*/
-
-/*
- 
-┌─┐┌─┐┌┐┌┌─┐┬┌─┐┬ ┬┬─┐┌─┐┌┬┐┬┌─┐┌┐┌
-│  │ ││││├┤ ││ ┬│ │├┬┘├─┤ │ ││ ││││
-└─┘└─┘┘└┘└  ┴└─┘└─┘┴└─┴ ┴ ┴ ┴└─┘┘└┘
-
 */
 
 :root {
   --sfwindow: %background%;
-  --sfsecondary: %blue%99;
+  --sfsecondary: %blue%;
 }
 
 /* Urlbar View */
@@ -59,6 +50,13 @@ by Miguel Avila
   background-color: var(--toolbar-bgcolor) !important;
 }
 
+.tabbrowser-tab {
+  font-weight: 600 !important;
+}
+/*.tabbrowser-tab[selected='true'] {
+  color: var(--sfwindow) !important;
+}*/
+
 /* Inactive tabs color */
 #navigator-toolbox {
   font-weight: 500 !important;
@@ -81,14 +79,12 @@ by Miguel Avila
 }
 
 /* 
-
 ┌┬┐┌─┐┬  ┌─┐┌┬┐┌─┐            
  ││├┤ │  ├┤  │ ├┤             
 ─┴┘└─┘┴─┘└─┘ ┴ └─┘            
 ┌─┐┌─┐┌┬┐┌─┐┌─┐┌┐┌┌─┐┌┐┌┌┬┐┌─┐
 │  │ ││││├─┘│ ││││├┤ │││ │ └─┐
 └─┘└─┘┴ ┴┴  └─┘┘└┘└─┘┘└┘ ┴ └─┘
-
 */
 
 /* Tabs elements  */
@@ -111,7 +107,7 @@ by Miguel Avila
 }
 
 :root {
-  --toolbarbutton-border-radius: 6px !important;
+  --toolbarbutton-border-radius: 0px !important;
   --toolbarbutton-border: 0 !important;
   --tab-border-radius: 4px 4px 0 0 !important;
   --tab-block-margin: 4px 4px 0 4px !important;

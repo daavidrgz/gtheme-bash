@@ -27,12 +27,16 @@ R="\e[1;31m"
 G="\e[1;32m"
 Y="\e[1;33m"
 B="\e[1;34m"
+M="\e[1;35m"
+C="\e[1;36m"
+GR="\e[0;2m"
 W="\e[0m"
 W_B="\e[1m"
 
 trap ctrl_c INT
 function ctrl_c() {
 	echo -e "\n\n${R}[!]${W} Exiting...\n"
+	tput cnorm
 	exit 0
 }
 
@@ -179,7 +183,7 @@ function showPatterns() {
 	echo
 }
 
-function showThemes() {
+function showAllThemes() {
 	declare -i COUNT=0
 	declare -a COLOR_SCHEMES=($@)
 
@@ -212,35 +216,107 @@ function showFavThemes() {
 
 function list() {
 	case "$1" in
-		"themes") showThemes "$(ls -p $THEMES_PATH | grep -v /)"; exit 0;;
+		"themes") showAllThemes "$(ls -p $THEMES_PATH | grep -v /)"; exit 0;;
 		"patterns") showPatterns "$(ls -p $PATTERNS_PATH | grep -v /)"; exit 0;;
 		"favs") showFavThemes; exit 0;;
 		*) echo -e "\n${R}[!]${W} Invalid option ${W_B}$1${W}!\n"; exit 1;;
 	esac
 }
 
-function mainLoop() {
-	declare -a COLOR_SCHEMES=($(ls $THEMES_PATH))
+function keyInput() {
+	read -rsn1 mode
+	if [ "$mode" == $'\x1b' ]; then
+		read -rsn2 mode
+	fi
 
-	declare -g TOTAL_THEMES
-	showThemes ${COLOR_SCHEMES[@]}
+	case $mode in
+		'[A') echo "up";;
+		'[B') echo "down";;
+		'') echo "enter";;
+		'f') echo "fav";;
+		*) echo invalid
+	esac
+}
 
-	while true; do
-		read -p "Select a color scheme: (q to quit) " res
+function showThemes() {
+	declare -a COLOR_SCHEMES=($(ls $THEMES_PATH | sed 's/.colors//g'))
+	declare -i COUNT=$1
+	declare -i NUM_ELEMS=20
 
-		([ "$res" == "q" ] || [ "$res" == "Q" ]) && ctrl_c
+	declare -i c=$(($COUNT-1-$NUM_ELEMS/2))
+	[ $(($c + $NUM_ELEMS+2)) -gt $TOTAL_THEMES ] && c=$TOTAL_THEMES-$NUM_ELEMS-2
 
-		if [[ ! -n $res || $res -ge $TOTAL_THEMES ]]; then
-			echo -e "\n${R}[!]${W} Invalid option!\n"
-			continue
+	declare -i i=0
+
+	while [ $i -lt $(($NUM_ELEMS+1)) ] ; do
+		c=c+1
+		[ $c -lt 0 ] && continue
+
+		if [ $c -eq $COUNT ]; then
+			echo -en "${B}•${W} ${W_B}${COLOR_SCHEMES[$c]} ${G}↓ ${Y}↑${W}"
+		else
+			echo -en "${GR}• ${COLOR_SCHEMES[$c]}${W}"
 		fi
 
-		declare THEME_NAME=${COLOR_SCHEMES[$res]}
-		generateFiles "$1" "$2" ${THEME_NAME::-7}
-
-		showThemes ${COLOR_SCHEMES[@]}
+		echo
+		i=i+1
 	done
 }
+
+function interactiveLoop() {
+	declare -a COLOR_SCHEMES=($(ls $THEMES_PATH | sed 's/.colors//g'))
+	declare -i COUNT=0
+	declare THEME_NAME=""
+
+	tput civis
+	echo
+	while true; do
+		clear
+
+		echo -e "${R} ██████╗ ${G} ████████╗${Y} ██╗  ██╗${B} ███████╗${M} ███╗   ███╗${C} ███████╗${W}"
+		echo -e "${R}██╔════╝ ${G} ╚══██╔══╝${Y} ██║  ██║${B} ██╔════╝${M} ████╗ ████║${C} ██╔════╝${W}"
+		echo -e "${R}██║  ███╗${G}    ██║   ${Y} ███████║${B} █████╗  ${M} ██╔████╔██║${C} █████╗  ${W}"
+		echo -e "${R}██║   ██║${G}    ██║   ${Y} ██╔══██║${B} ██╔══╝  ${M} ██║╚██╔╝██║${C} ██╔══╝  ${W}"
+		echo -e "${R}╚██████╔╝${G}    ██║   ${Y} ██║  ██║${B} ███████╗${M} ██║ ╚═╝ ██║${C} ███████╗${W}"
+		echo -e "${R} ╚═════╝ ${G}    ╚═╝   ${Y} ╚═╝  ╚═╝${B} ╚══════╝${M} ╚═╝     ╚═╝${C} ╚══════╝${W}"
+		echo
+
+		showThemes $COUNT
+		THEME_NAME=${COLOR_SCHEMES[$COUNT]}
+		arrow=$(keyInput)
+		case $arrow in
+			"up") [ $COUNT -gt 0 ] && COUNT=$COUNT-1;;
+			"down") [ $COUNT -lt $(($TOTAL_THEMES-1)) ] && COUNT=$COUNT+1;;
+			"enter") echo -e "\n${B}Applying...${W}"; generateFiles "$1" "$2" $THEME_NAME &>/dev/null;;
+			"fav") flagAsFavourite $THEME_NAME; sleep 1;;
+			*) ;;
+		esac
+	done
+	tput cnorm
+}
+
+# function mainLoop() {
+# 	declare -a COLOR_SCHEMES=($(ls $THEMES_PATH))
+
+# 	declare -g TOTAL_THEMES
+# 	showAllThemes ${COLOR_SCHEMES[@]}
+
+# 	while true; do
+# 		read -p "Select a color scheme: (q to quit) " res
+
+# 		([ "$res" == "q" ] || [ "$res" == "Q" ]) && ctrl_c
+
+# 		if [[ ! -n $res || $res -ge $TOTAL_THEMES ]]; then
+# 			echo -e "\n${R}[!]${W} Invalid option!\n"
+# 			continue
+# 		fi
+
+# 		declare THEME_NAME=${COLOR_SCHEMES[$res]}
+# 		generateFiles "$1" "$2" ${THEME_NAME::-7}
+
+# 		showAllThemes ${COLOR_SCHEMES[@]}
+# 	done
+# }
 
 function flagAsFavourite() {
 	declare -a FAV_THEMES=($@)
@@ -256,8 +332,6 @@ function flagAsFavourite() {
 			echo -e "${G}[+]${W} Theme ${W_B}$theme${W} succesfully added to favourites!\n"
 		fi
 	done
-
-	exit 0
 }
 
 function addPatterns() {
@@ -328,6 +402,7 @@ function checkThemes() {
 
 declare -gi IS_VSCODE=1
 declare -gi IS_WALLPAPER=1
+declare -gi TOTAL_THEMES=$(ls $THEMES_PATH | wc -l)
 function main() {
 	while getopts "l:hi:n:p:vwa:r:f:" option; do
 		case $option in
@@ -335,7 +410,7 @@ function main() {
 			h) helpPanel; exit 0;;
 			a) addPatterns "$(echo $OPTARG | sed 's/,/ /g')";;
 			r) removePatterns "$(echo $OPTARG | sed 's/,/ /g')";;
-			f) flagAsFavourite "$(echo $OPTARG | sed 's/,/ /g')";;
+			f) flagAsFavourite "$(echo $OPTARG | sed 's/,/ /g')"; exit 0;;
 			n) declare theme_name=$OPTARG;;
 			p) declare patterns=$OPTARG;;
 			i) declare inverted_patterns=$OPTARG;;
@@ -349,7 +424,7 @@ function main() {
 	inverted_patterns="$(echo $inverted_patterns | sed 's/,/ /g')"
 	checkPatterns "$patterns $inverted_patterns"
 
-	[ -z $theme_name ] && mainLoop "$patterns" "$inverted_patterns"
+	[ -z $theme_name ] && interactiveLoop "$patterns" "$inverted_patterns"
 
 	if [ ! -e $THEMES_PATH/$theme_name.colors ]; then
 		echo -e "\n${R}[!]${W} The theme ${W_B}$theme_name${W} does not exist!\n"

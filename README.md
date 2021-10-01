@@ -8,7 +8,7 @@ Thus, it can create and replace in real time a rofi colors.rasi file, an alacrit
 to a global theme change perception that we all really need.
 
 It also supports:
-* Executing a post script to, for example, reset the dunst notification daemon or refresh the terminal colors with tput.
+* Executing a post script to, for example, restart the dunst notification daemon or refresh the terminal colors with tput.
 * Changing the wallpaper to match your new color scheme (**wallpaper collection included** 😉).
 * Changing the Visual Studio Code theme.
 
