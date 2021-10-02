@@ -35,15 +35,15 @@ W_B="\e[1m"
 
 trap ctrl_c INT
 function ctrl_c() {
-	echo -e "\n\n${R}[!]${W} Exiting...\n"
-	tput cnorm
-	exit 0
+  echo -e "\n${R}[!]${W} Exiting...\n"
+  tput cnorm
+  exit 0
 }
 
 function helpPanel() {
-	echo -e "\n${Y}[*]${W} Usage: gtheme [OPTIONS...]"
-  echo -e "\nIf ${W_B}the flag -p isn't passed${W}, the choosed theme will be applied to ${W_B}all active patterns${W} by default."
-	echo -e "\nOPTIONS:
+  echo -e "\n${Y}[*]${W} Usage: gtheme [OPTIONS...]"
+  echo -e "\n${W_B}If the flag -p is not present${W}, the choosed theme will be applied to ${W_B}all active patterns${W} by default."
+  echo -e "\nOPTIONS:
   ${G}-a${W} <PATT1,PATT2...>       activate selected patterns.
   ${G}-r${W} <PATT1,PATT2...>       desactivate selected patterns.
   ${G}-p${W} <PATT1,PATT2...>       apply the theme only on selected patterns. Important: There must be no spaces between the patterns, only commas.
@@ -57,242 +57,296 @@ function helpPanel() {
 }
 
 function executePostScript() {
-	declare -r APP_NAME=$1
+  declare -r APP_NAME=$1
 
-	echo -e "${B}•${W} Executing post-script..."
+  echo -e "${B}•${W} Executing post-script..."
 
-	if [ ! -e $POSTSCRIPTS_PATH/$APP_NAME.sh ]; then
-		echo -e "${Y}•${W} No post-script found!"
-		return
-	fi
+  if [ ! -e $POSTSCRIPTS_PATH/$APP_NAME.sh ]; then
+    echo -e "${Y}•${W} No post-script found!"
+    return
+  fi
 
-	$POSTSCRIPTS_PATH/$APP_NAME.sh $2
+  $POSTSCRIPTS_PATH/$APP_NAME.sh $2
 }
 
 function setWallpaper() {
-	declare -r WALLPAPER=$(cat $THEMES_PATH/$1.colors | grep wallpaper | awk -F ': ' '{print $2}')
+  declare -r WALLPAPER=$(/bin/cat $THEMES_PATH/$1.colors | grep wallpaper | awk -F ': ' '{print $2}')
 
-	[ -z "$WALLPAPER" ] && return
+  [ -z "$WALLPAPER" ] && return
 
-	sed -i "s|.*WALLPAPER_URL=.*|WALLPAPER_URL=$WALLPAPER|" $SET_WALLPAPER_SCRIPT
-	if [ ! -x $SET_WALLPAPER_SCRIPT ]; then
-		echo -e "\n${Y}[!]${W} $SET_WALLPAPER_SCRIPT is not executable. Run chmod +x $SET_WALLPAPER_SCRIPT to solve it"
-		return
-	fi
+  sed -i "s|.*WALLPAPER_URL=.*|WALLPAPER_URL=$WALLPAPER|" $SET_WALLPAPER_SCRIPT
+  if [ ! -x $SET_WALLPAPER_SCRIPT ]; then
+    echo -e "\n${Y}[!]${W} $SET_WALLPAPER_SCRIPT is not executable. Run chmod +x $SET_WALLPAPER_SCRIPT to solve it"
+    return
+  fi
 
-	if $SET_WALLPAPER_SCRIPT; then
-		echo -e "${B}[+]${W} Wallpaper ${W_B}$(basename $WALLPAPER)${W} applied!\n"
+  if $SET_WALLPAPER_SCRIPT; then
+    echo -e "${B}[+]${W} Wallpaper ${W_B}$(basename $WALLPAPER)${W} applied!\n"
 
-		sed -i "/.*wallpaper.*/d" $CURRENT_THEME_FILE
-		echo -e "wallpaper: $WALLPAPER" >> $CURRENT_THEME_FILE
-	else
-		echo -e "${R}[!]${W} There was an error while setting the wallpaper.\n"
-	fi
+    sed -i "/.*wallpaper.*/d" $CURRENT_THEME_FILE
+    echo -e "wallpaper: $WALLPAPER" >> $CURRENT_THEME_FILE
+  else
+    echo -e "${R}[!]${W} There was an error while setting the wallpaper.\n"
+  fi
 }
 
 function setVscodeTheme() {
-	declare -r VSCODETHEME=$(cat $THEMES_PATH/$1.colors | grep vscode | awk -F ': ' '{print $2}')
-	[ -z "$VSCODETHEME" ] && return
+  declare -r VSCODETHEME=$(/bin/cat $THEMES_PATH/$1.colors | grep vscode | awk -F ': ' '{print $2}')
+  [ -z "$VSCODETHEME" ] && return
 
-	sed -i "s|\"workbench.colorTheme\": \".*\"|\"workbench.colorTheme\": \"$VSCODETHEME\"|" $VSCODE_SETTINGS_FILE
-	echo -e "${B}[+]${W} Theme ${W_B}\"$VSCODETHEME\"${W} applied to Visual Studio Code!\n"
+  sed -i "s|\"workbench.colorTheme\": \".*\"|\"workbench.colorTheme\": \"$VSCODETHEME\"|" $VSCODE_SETTINGS_FILE
+  echo -e "${B}[+]${W} Theme ${W_B}\"$VSCODETHEME\"${W} applied to Visual Studio Code!\n"
 
-	sed -i "/.*vscode.*/d" $CURRENT_THEME_FILE
-	echo -e "vscode: $VSCODETHEME" >> $CURRENT_THEME_FILE
+  sed -i "/.*vscode.*/d" $CURRENT_THEME_FILE
+  echo -e "vscode: $VSCODETHEME" >> $CURRENT_THEME_FILE
 }
 
 function fillPattern() {
-	echo -e "${B}•${W} Generating file for $1..."
+  echo -e "${B}•${W} Generating file for $1..."
 
-	declare -r PATTERN="$ACTIVE_PATTERNS_PATH/$1.pattern"
-	declare -r IS_INVERTED=$3
+  declare -r PATTERN="$ACTIVE_PATTERNS_PATH/$1.pattern"
+  declare -r IS_INVERTED=$3
 
-	declare DEST="$(cat $PATTERN | grep -e ".*%output-file%.*" | awk -F '=' '{print $2}')"
+  declare DEST="$(/bin/cat $PATTERN | grep -e ".*%output-file%.*" | awk -F '=' '{print $2}')"
 
-	if [ -z "$DEST" ]; then
-		echo -e "${R}[!]${W} No output file found. Using the default path."
-		DEST=$HOME/.config/$1/gtheme-colors
-	fi
+  if [ -z "$DEST" ]; then
+    echo -e "${R}[!]${W} No output file found. Using the default path."
+    DEST=$HOME/.config/$1/gtheme-colors
+  fi
 
-	if [ ! -e "$(dirname $DEST)" ]; then
-		echo -e "${R}[!]${W} The folder ${W_B}$(dirname $DEST)${W} does not exist!\n"
-		return
-	fi
+  if [ ! -e "$(dirname $DEST)" ]; then
+    echo -e "${R}[!]${W} The folder ${W_B}$(dirname $DEST)${W} does not exist!\n"
+    return
+  fi
 
-	cp $PATTERN $DEST
-	
-	declare -r CONTENT="$(cat $THEMES_PATH/$2.colors)"
-	for attr in ${ATTR_NAMES[@]}; do
-		declare VALUE=$(echo "$CONTENT" | grep -e "^$attr:.*" | awk -F ': ' '{print $2}')
+  cp $PATTERN $DEST
+  
+  declare -r CONTENT="$(/bin/cat $THEMES_PATH/$2.colors)"
+  for attr in ${ATTR_NAMES[@]}; do
+    declare VALUE=$(echo "$CONTENT" | grep -e "^$attr:.*" | awk -F ': ' '{print $2}')
 
-		# Invert colors
-		if [ $IS_INVERTED -eq 0 ]; then
-			if [ "$attr" == "background" ]; then
-				attr="foreground"
-			elif [ "$attr" == "foreground" ]; then
-				attr="background"
-			fi
-		fi
+    # Invert colors
+    if [ $IS_INVERTED -eq 0 ]; then
+      if [ "$attr" == "background" ]; then
+        attr="foreground"
+      elif [ "$attr" == "foreground" ]; then
+        attr="background"
+      elif [ "$attr" == "selection-background" ]; then
+        attr="selection-foreground"
+      elif [ "$attr" == "selection-foreground" ]; then
+        attr="selection-background"
+      fi
+    fi
 
-		sed -i "s|%$attr%|$VALUE|g" $DEST
-	done
+    sed -i "s|%$attr%|$VALUE|g" $DEST
+  done
 
-	sed -i "s|%theme-name%| -------- Theme: $2 --------|" $DEST
-	sed -i "s|.*%output-file%.*||" $DEST
+  sed -i "s|%theme-name%| -------- Theme: $2 --------|" $DEST
+  sed -i "s|.*%output-file%.*||" $DEST
 
-	echo -e "${B}•${W} Created file ${W_B}$(basename $DEST)${W} in ${W_B}$(dirname $DEST)${W}"
+  echo -e "${B}•${W} Created file ${W_B}$(basename $DEST)${W} in ${W_B}$(dirname $DEST)${W}"
 
-	executePostScript $1 $DEST
+  executePostScript $1 $DEST
 
-	echo -e "${B}•${W} Theme applied to ${G}$1${W}\n"
+  echo -e "${B}•${W} Theme applied to ${G}$1${W}\n"
 
-	echo -e "---------------------\n"
+  echo -e "---------------------\n"
 }
 
 function generateFiles() {
-	declare PATTERNS="$1"
-	declare -r INVERTED_PATTERNS="$2"
-	declare -r THEME_NAME="$3"
+  declare PATTERNS="$1"
+  declare -r INVERTED_PATTERNS="$2"
+  declare -r THEME_NAME="$3"
 
-	[ -z "$PATTERNS" ] && PATTERNS="$(ls -p $ACTIVE_PATTERNS_PATH | grep -v / | sed 's/\..*//g' )"
+  [ -z "$PATTERNS" ] && PATTERNS="$(ls $ACTIVE_PATTERNS_PATH | sed 's/.pattern//g' )"
 
-	echo
-	for PATTERN in $PATTERNS; do
-		echo "$INVERTED_PATTERNS" | grep $PATTERN &>/dev/null
-		fillPattern $PATTERN $THEME_NAME $?
+  echo
+  for PATTERN in $PATTERNS; do
+    echo "$INVERTED_PATTERNS" | grep $PATTERN &>/dev/null
+    fillPattern $PATTERN $THEME_NAME $?
 
-		sed -i "/$PATTERN:.*/d" $CURRENT_THEME_FILE
-		echo -e "$PATTERN: $THEME_NAME" >> $CURRENT_THEME_FILE
-	done
+    sed -i "/$PATTERN:.*/d" $CURRENT_THEME_FILE
+    echo -e "$PATTERN: $THEME_NAME" >> $CURRENT_THEME_FILE
+  done
 
-	[ $IS_VSCODE -eq 0 ] && setVscodeTheme $THEME_NAME
-	[ $IS_WALLPAPER -eq 0 ] && setWallpaper $THEME_NAME
+  [ $IS_VSCODE -eq 0 ] && setVscodeTheme $THEME_NAME
+  [ $IS_WALLPAPER -eq 0 ] && setWallpaper $THEME_NAME
 }
 
 function showPatterns() {
-	declare -a PATTERNS=($@)
+  declare -a PATTERNS=($@)
 
-	echo
-	for pattern in "${PATTERNS[@]}"; do
-		if [ -e $ACTIVE_PATTERNS_PATH/$pattern ]; then
-			printf "${B}•${W} %-20s ${B}Active${W}\n" "${pattern::-8}"
-		else
-			printf "${Y}•${W} %-20s ${Y}Not active${W}\n" "${pattern::-8}"
-		fi
-	done
-	echo
+  echo
+  for pattern in "${PATTERNS[@]}"; do
+    if [ -e $ACTIVE_PATTERNS_PATH/$pattern ]; then
+      printf "${B}•${W} %-20s ${B}Active${W}\n" "${pattern::-8}"
+    else
+      printf "${Y}•${W} %-20s ${Y}Not active${W}\n" "${pattern::-8}"
+    fi
+  done
+  echo
 }
-
 function showAllThemes() {
-	declare -i COUNT=0
-	declare -a COLOR_SCHEMES=($@)
+  declare -i COUNT=0
+  declare -a COLOR_SCHEMES=($@)
 
-	echo
-	for theme in "${COLOR_SCHEMES[@]}"; do
-		declare FAV_COLOR=${W}
-		if cat $FAV_THEMES_FILE | grep -e "^${theme::-7}$" &>/dev/null; then
-			FAV_COLOR=${Y}
-		fi
+  echo
+  for theme in "${COLOR_SCHEMES[@]}"; do
+    declare FAV_COLOR=${W}
+    if /bin/cat $FAV_THEMES_FILE | grep -e "^${theme::-7}$" &>/dev/null; then
+      FAV_COLOR=${Y}
+    fi
 
-		if cat $CURRENT_THEME_FILE | grep -e ": ${theme::-7}$" &>/dev/null; then
-			printf "${B}%7s${W} ${FAV_COLOR}%s ${B}(active)${W}\n" "[$COUNT]" "• ${theme::-7}"
-		else
-			printf "${G}%7s${W} ${FAV_COLOR}%s${W}\n" "[$COUNT]" "• ${theme::-7}"
-		fi
-		COUNT=$COUNT+1
-	done
-	echo
-
-	TOTAL_THEMES=$COUNT
+    if /bin/cat $CURRENT_THEME_FILE | grep -e ": ${theme::-7}$" &>/dev/null; then
+      printf "${B}%7s${W} ${FAV_COLOR}%s ${B}(active)${W}\n" "[$COUNT]" "• ${theme::-7}"
+    else
+      printf "${G}%7s${W} ${FAV_COLOR}%s${W}\n" "[$COUNT]" "• ${theme::-7}"
+    fi
+    COUNT=$COUNT+1
+  done
+  echo
 }
-
 function showFavThemes() {
-	echo
-	for theme in $(cat $FAV_THEMES_FILE); do
-		echo -e "${Y}•${W} $theme"
-	done
-	echo
+  echo
+  for theme in $(/bin/cat $FAV_THEMES_FILE); do
+    echo -e "${Y}•${W} $theme"
+  done
+  echo
 }
 
 function list() {
-	case "$1" in
-		"themes") showAllThemes "$(ls -p $THEMES_PATH | grep -v /)"; exit 0;;
-		"patterns") showPatterns "$(ls -p $PATTERNS_PATH | grep -v /)"; exit 0;;
-		"favs") showFavThemes; exit 0;;
-		*) echo -e "\n${R}[!]${W} Invalid option ${W_B}$1${W}!\n"; exit 1;;
-	esac
+  case "$1" in
+    "themes") showAllThemes "$(ls -p $THEMES_PATH | grep -v /)"; exit 0;;
+    "patterns") showPatterns "$(ls -p $PATTERNS_PATH | grep -v /)"; exit 0;;
+    "favs") showFavThemes; exit 0;;
+    *) echo -e "\n${R}[!]${W} Invalid option ${W_B}$1${W}!\n"; exit 1;;
+  esac
 }
 
 function keyInput() {
-	read -rsn1 mode
-	if [ "$mode" == $'\x1b' ]; then
-		read -rsn2 mode
-	fi
+  read -rsn1 mode
+  if [ "$mode" == $'\x1b' ]; then
+    read -rsn2 mode
+  fi
 
-	case $mode in
-		'[A') echo "up";;
-		'[B') echo "down";;
-		'') echo "enter";;
-		'f') echo "fav";;
-		*) echo invalid
-	esac
+  case $mode in
+    '[A') echo "up";;
+    '[B') echo "down";;
+    '') echo "enter";;
+    'f') echo "f";;
+    'q') echo "q";;
+    'h') echo "h";;
+    'v') echo "v";;
+    'w') echo "w";;
+    *) echo invalid
+  esac
+}
+
+function showInteractiveHelp() {
+  while true; do
+    clear
+
+    echo -e "${W_B}OPTIONS${W}\n"
+    echo -e "  ${B}'enter'${W}      apply theme"
+    echo -e "  ${B}'arrow up'${W}   previous theme"
+    echo -e "  ${B}'arrow down'${W} next theme"
+    echo -e "  ${B}'q'${W}          quit"
+    echo -e "  ${B}'f'${W}          flag/unflag as favourite"
+    echo -e "  ${B}'w'${W}          apply/not apply wallpaper"
+    echo -e "  ${B}'v'${W}          apply/not apply vscode theme"
+    echo -e "  ${B}'h'${W}          show/hide this panel"
+
+    INPUT=$(keyInput)
+    [ "$INPUT" == "h" ] && break
+    [ "$INPUT" == "q" ] && ctrl_c
+  done
+}
+
+function showFlagStatus() {
+  echo -en "\nVSCode "
+  if [ $IS_VSCODE -eq 0 ]; then
+    echo -en "${G}• ON${W}"
+  else
+    echo -en "${R}• OFF${W}"
+  fi
+  echo -en "\nWallpaper "
+  if [ $IS_WALLPAPER -eq 0 ]; then
+    echo -e "${G}• ON${W}"
+  else
+    echo -e "${R}• OFF${W}"
+  fi
 }
 
 function showThemes() {
-	declare -a COLOR_SCHEMES=($(ls $THEMES_PATH | sed 's/.colors//g'))
-	declare -i COUNT=$1
-	declare -i NUM_ELEMS=20
+  declare -i NUM_ELEMS=20
 
-	declare -i c=$(($COUNT-1-$NUM_ELEMS/2))
-	[ $(($c + $NUM_ELEMS+2)) -gt $TOTAL_THEMES ] && c=$TOTAL_THEMES-$NUM_ELEMS-2
+  declare -i c=$(( $THEME_IDX - $NUM_ELEMS/2 - 1 ))
+  [ $(( $c + $NUM_ELEMS + 2 )) -gt $TOTAL_THEMES ] && (( c = $TOTAL_THEMES - $NUM_ELEMS - 2 ))
 
-	declare -i i=0
+  declare -i SHOWN_ELEMS=0
 
-	while [ $i -lt $(($NUM_ELEMS+1)) ] ; do
-		c=c+1
-		[ $c -lt 0 ] && continue
+  while [ $SHOWN_ELEMS -le $(( $NUM_ELEMS )) ]; do
+    (( c += 1 ))
+    [ $c -lt 0 ] && continue
 
-		if [ $c -eq $COUNT ]; then
-			echo -en "${B}•${W} ${W_B}${COLOR_SCHEMES[$c]} ${G}↓ ${Y}↑${W}"
-		else
-			echo -en "${GR}• ${COLOR_SCHEMES[$c]}${W}"
-		fi
+    if [ $c -eq $THEME_IDX ]; then
+      echo -e "${B}•${W} ${W_B}${COLOR_SCHEMES[$c]} ${G}↓ ${Y}↑${W}"
+    else
+      echo -e "${GR}• ${COLOR_SCHEMES[$c]}${W}"
+    fi
 
-		echo
-		i=i+1
-	done
+    (( SHOWN_ELEMS += 1 ))
+  done
 }
 
 function interactiveLoop() {
-	declare -a COLOR_SCHEMES=($(ls $THEMES_PATH | sed 's/.colors//g'))
-	declare -i COUNT=0
-	declare THEME_NAME=""
+  declare -a COLOR_SCHEMES=( $(ls $THEMES_PATH | sed 's/.colors//g') )
+  declare -i THEME_IDX=0
+  declare THEME_NAME
+  declare INPUT
 
-	tput civis
-	echo
-	while true; do
-		clear
+  tput civis
+  echo
+  while true; do
+    clear
 
-		echo -e "${R} ██████╗ ${G} ████████╗${Y} ██╗  ██╗${B} ███████╗${M} ███╗   ███╗${C} ███████╗${W}"
-		echo -e "${R}██╔════╝ ${G} ╚══██╔══╝${Y} ██║  ██║${B} ██╔════╝${M} ████╗ ████║${C} ██╔════╝${W}"
-		echo -e "${R}██║  ███╗${G}    ██║   ${Y} ███████║${B} █████╗  ${M} ██╔████╔██║${C} █████╗  ${W}"
-		echo -e "${R}██║   ██║${G}    ██║   ${Y} ██╔══██║${B} ██╔══╝  ${M} ██║╚██╔╝██║${C} ██╔══╝  ${W}"
-		echo -e "${R}╚██████╔╝${G}    ██║   ${Y} ██║  ██║${B} ███████╗${M} ██║ ╚═╝ ██║${C} ███████╗${W}"
-		echo -e "${R} ╚═════╝ ${G}    ╚═╝   ${Y} ╚═╝  ╚═╝${B} ╚══════╝${M} ╚═╝     ╚═╝${C} ╚══════╝${W}"
-		echo
+    echo -e "${R} ██████╗ ${G} ████████╗${Y} ██╗  ██╗${B} ███████╗${M} ███╗   ███╗${C} ███████╗${W}"
+    echo -e "${R}██╔════╝ ${G} ╚══██╔══╝${Y} ██║  ██║${B} ██╔════╝${M} ████╗ ████║${C} ██╔════╝${W}"
+    echo -e "${R}██║  ███╗${G}    ██║   ${Y} ███████║${B} █████╗  ${M} ██╔████╔██║${C} █████╗  ${W}"
+    echo -e "${R}██║   ██║${G}    ██║   ${Y} ██╔══██║${B} ██╔══╝  ${M} ██║╚██╔╝██║${C} ██╔══╝  ${W}"
+    echo -e "${R}╚██████╔╝${G}    ██║   ${Y} ██║  ██║${B} ███████╗${M} ██║ ╚═╝ ██║${C} ███████╗${W}"
+    echo -e "${R} ╚═════╝ ${G}    ╚═╝   ${Y} ╚═╝  ╚═╝${B} ╚══════╝${M} ╚═╝     ╚═╝${C} ╚══════╝${W}"
+    echo -e "\n"
 
-		showThemes $COUNT
-		THEME_NAME=${COLOR_SCHEMES[$COUNT]}
-		arrow=$(keyInput)
-		case $arrow in
-			"up") [ $COUNT -gt 0 ] && COUNT=$COUNT-1;;
-			"down") [ $COUNT -lt $(($TOTAL_THEMES-1)) ] && COUNT=$COUNT+1;;
-			"enter") echo -e "\n${B}Applying...${W}"; generateFiles "$1" "$2" $THEME_NAME &>/dev/null;;
-			"fav") flagAsFavourite $THEME_NAME; sleep 1;;
-			*) ;;
-		esac
-	done
-	tput cnorm
+    showThemes $THEME_IDX
+    showFlagStatus
+
+    THEME_NAME=${COLOR_SCHEMES[$THEME_IDX]}
+    INPUT=$(keyInput)
+    case $INPUT in
+      'up')
+        [ $THEME_IDX -gt 0 ] && (( THEME_IDX -= 1 ));;
+      'down')
+        [ $THEME_IDX -lt $(( $TOTAL_THEMES - 1 )) ] && (( THEME_IDX += 1 ));;
+      'enter')
+        echo -e "\n${B}Applying...${W}"
+        generateFiles "$1" "$2" $THEME_NAME &>/dev/null;;
+      'f') 
+        flagAsFavourite $THEME_NAME
+        sleep 1;;
+      'v')
+        IS_VSCODE=$(( ! $IS_VSCODE ));;
+      'w')
+        IS_WALLPAPER=$(( ! $IS_WALLPAPER ));;
+      'q') 
+        ctrl_c;;
+      'h')
+        showInteractiveHelp;;
+      *)
+        ;;
+    esac
+  done
+  tput cnorm
 }
 
 # function mainLoop() {
@@ -319,119 +373,129 @@ function interactiveLoop() {
 # }
 
 function flagAsFavourite() {
-	declare -a FAV_THEMES=($@)
-	checkThemes "$@" 
+  declare -a FAV_THEMES=($@)
+  checkThemes "$@" 
 
-	echo
-	for theme in ${FAV_THEMES[@]}; do
-		if cat $FAV_THEMES_FILE | grep $theme &>/dev/null; then
-			sed -i "/$theme/d" $FAV_THEMES_FILE
-			echo -e "${G}[-]${W} Theme ${W_B}$theme${W} succesfully removed from favourites!\n"
-		else
-			echo $theme >> $FAV_THEMES_FILE
-			echo -e "${G}[+]${W} Theme ${W_B}$theme${W} succesfully added to favourites!\n"
-		fi
-	done
+  echo
+  for theme in ${FAV_THEMES[@]}; do
+    if /bin/cat $FAV_THEMES_FILE | grep $theme &>/dev/null; then
+      sed -i "/$theme/d" $FAV_THEMES_FILE
+      echo -e "${G}[-]${W} Theme ${W_B}$theme${W} succesfully removed from favourites!\n"
+    else
+      echo $theme >> $FAV_THEMES_FILE
+      echo -e "${G}[+]${W} Theme ${W_B}$theme${W} succesfully added to favourites!\n"
+    fi
+  done
 }
 
 function addPatterns() {
-	declare -a ADD_PATTERNS=($@)
-	checkPatterns "$@"
+  declare -a ADD_PATTERNS=($@)
+  checkPatterns "$@"
 
-	echo
-	for pattern in ${ADD_PATTERNS[@]}; do
-		if [ -e $ACTIVE_PATTERNS_PATH/$pattern.pattern ]; then
-			echo -e "${Y}[!]${W} The pattern ${W_B}$pattern${W} is already active!\n"
-			continue
-		fi
+  echo
+  for pattern in ${ADD_PATTERNS[@]}; do
+    if [ -e $ACTIVE_PATTERNS_PATH/$pattern.pattern ]; then
+      echo -e "${Y}[!]${W} The pattern ${W_B}$pattern${W} is already active!\n"
+      continue
+    fi
 
-		echo -e "${Y}•${W} Creating symlink ${W_B}$ACTIVE_PATTERNS_PATH/$pattern.pattern${W}..."
-		if ln -s ../$pattern.pattern $ACTIVE_PATTERNS_PATH/$pattern.pattern; then
-			echo -e "${G}•${W} Pattern ${W_B}$pattern${W} succesfully activated!\n"
-		else
-			echo -e "${R}•${W} Error while activating the pattern $pattern!\n"
-		fi
-	done
+    echo -e "${Y}•${W} Creating symlink ${W_B}$ACTIVE_PATTERNS_PATH/$pattern.pattern${W}..."
+    if ln -s ../$pattern.pattern $ACTIVE_PATTERNS_PATH/$pattern.pattern; then
+      echo -e "${G}•${W} Pattern ${W_B}$pattern${W} succesfully activated!\n"
+    else
+      echo -e "${R}•${W} Error while activating the pattern $pattern!\n"
+    fi
+  done
 
-	exit 0
+  exit 0
 }
 
 function removePatterns() {
-	declare -a REMOVE_PATTERNS=($@)
-	checkPatterns "$@"
+  declare -a REMOVE_PATTERNS=($@)
+  checkPatterns "$@"
 
-	echo
-	for pattern in ${REMOVE_PATTERNS[@]}; do
-		if [ ! -e $ACTIVE_PATTERNS_PATH/$pattern.pattern ]; then
-			echo -e "${Y}[!]${W} The pattern ${W_B}$pattern${W} is already inactive!\n"
-			continue
-		fi
+  echo
+  for pattern in ${REMOVE_PATTERNS[@]}; do
+    if [ ! -e $ACTIVE_PATTERNS_PATH/$pattern.pattern ]; then
+      echo -e "${Y}[!]${W} The pattern ${W_B}$pattern${W} is already inactive!\n"
+      continue
+    fi
 
-		echo -e "${Y}•${W} Deleting symlink ${W_B}$ACTIVE_PATTERNS_PATH/$pattern.pattern${W}..."
-		if rm $ACTIVE_PATTERNS_PATH/$pattern.pattern; then
-			echo -e "${G}•${W} Pattern ${W_B}$pattern${W} succesfully desactivated!\n"
-		else
-			echo -e "${R}•${W} Error while desactivating the pattern $pattern!\n"
-		fi
-	done
+    echo -e "${Y}•${W} Deleting symlink ${W_B}$ACTIVE_PATTERNS_PATH/$pattern.pattern${W}..."
+    if rm $ACTIVE_PATTERNS_PATH/$pattern.pattern; then
+      echo -e "${G}•${W} Pattern ${W_B}$pattern${W} succesfully desactivated!\n"
+    else
+      echo -e "${R}•${W} Error while desactivating the pattern $pattern!\n"
+    fi
+  done
 
-	exit 0;
+  exit 0;
 }
 
 function checkPatterns() {
-	declare -a PATTERNS=($@)
+  declare -a PATTERNS=($@)
 
-	for pattern in ${PATTERNS[@]}; do
-		if [ ! -e $PATTERNS_PATH/$pattern.pattern ]; then
-			echo -e "\n${R}[!]${W} The pattern ${W_B}$pattern${W} does not exist!\n"
-			exit 1
-		fi
-	done
+  for pattern in ${PATTERNS[@]}; do
+    if [ ! -e $PATTERNS_PATH/$pattern.pattern ]; then
+      echo -e "\n${R}[!]${W} The pattern ${W_B}$pattern${W} does not exist!\n"
+      exit 1
+    fi
+  done
 }
 
 function checkThemes() {
-	declare -a THEMES=($@)
+  declare -a THEMES=($@)
 
-	for theme in ${THEMES[@]}; do
-		if [ ! -e $THEMES_PATH/$theme.colors ]; then
-			echo -e "\n${R}[!]${W} The theme ${W_B}$theme${W} does not exist!\n"
-			exit 1
-		fi
-	done
+  for theme in ${THEMES[@]}; do
+    if [ ! -e $THEMES_PATH/$theme.colors ]; then
+      echo -e "\n${R}[!]${W} The theme ${W_B}$theme${W} does not exist!\n"
+      exit 1
+    fi
+  done
 }
 
 declare -gi IS_VSCODE=1
 declare -gi IS_WALLPAPER=1
 declare -gi TOTAL_THEMES=$(ls $THEMES_PATH | wc -l)
 function main() {
-	while getopts "l:hi:n:p:vwa:r:f:" option; do
-		case $option in
-			l) list $OPTARG;;
-			h) helpPanel; exit 0;;
-			a) addPatterns "$(echo $OPTARG | sed 's/,/ /g')";;
-			r) removePatterns "$(echo $OPTARG | sed 's/,/ /g')";;
-			f) flagAsFavourite "$(echo $OPTARG | sed 's/,/ /g')"; exit 0;;
-			n) declare theme_name=$OPTARG;;
-			p) declare patterns=$OPTARG;;
-			i) declare inverted_patterns=$OPTARG;;
-			v) IS_VSCODE=0;;
-			w) IS_WALLPAPER=0;;
-			*) helpPanel; exit 1;;
-		esac
-	done
-	
-	patterns="$(echo $patterns | sed 's/,/ /g')"
-	inverted_patterns="$(echo $inverted_patterns | sed 's/,/ /g')"
-	checkPatterns "$patterns $inverted_patterns"
+  while getopts "l:hi:n:p:vwa:r:f:" opt; do
+    case $opt in
+      'l')
+        list $OPTARG;;
+      'h') 
+        helpPanel
+        exit 0;;
+      'a')
+        addPatterns "$(echo $OPTARG | sed 's/,/ /g')";;
+      'r')
+        removePatterns "$(echo $OPTARG | sed 's/,/ /g')";;
+      'f')
+        flagAsFavourite "$(echo $OPTARG | sed 's/,/ /g')"
+        exit 0;;
+      'n')
+        declare THEME_NAME=$OPTARG;;
+      'p')
+        declare PATTERNS=$OPTARG;;
+      'i')
+        declare INVERTED_PATTERNS=$OPTARG;;
+      'v')
+        IS_VSCODE=0;;
+      'w')
+        IS_WALLPAPER=0;;
+      *) 
+        helpPanel
+        exit 1;;
+    esac
+  done
+  
+  PATTERNS="$(echo $PATTERNS | sed 's/,/ /g')"
+  INVERTED_PATTERNS="$(echo $INVERTED_PATTERNS | sed 's/,/ /g')"
+  checkPatterns "$PATTERNS $INVERTED_PATTERNS"
 
-	[ -z $theme_name ] && interactiveLoop "$patterns" "$inverted_patterns"
+  [ -z "$THEME_NAME" ] && interactiveLoop "$PATTERNS" "$INVERTED_PATTERNS"
 
-	if [ ! -e $THEMES_PATH/$theme_name.colors ]; then
-		echo -e "\n${R}[!]${W} The theme ${W_B}$theme_name${W} does not exist!\n"
-		exit 1
-	fi
-
-	generateFiles "$patterns" "$inverted_patterns" $theme_name
+  checkThemes $THEME_NAME
+  generateFiles "$PATTERNS" "$INVERTED_PATTERNS" $THEME_NAME
 }
 
 main "$@"
