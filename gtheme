@@ -8,20 +8,6 @@
 #  ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝
 # @daavidrgz
 
-GTHEME_PATH=$XDG_CONFIG_HOME/gtheme
-THEMES_PATH=$GTHEME_PATH/themes
-PATTERNS_PATH=$GTHEME_PATH/patterns
-ACTIVE_PATTERNS_PATH=$GTHEME_PATH/patterns/active-patterns
-POSTSCRIPTS_PATH=$GTHEME_PATH/post-scripts
-CURRENT_THEME_FILE=$GTHEME_PATH/current-theme
-FAV_THEMES_FILE=$GTHEME_PATH/fav-themes
-
-# •• Global Settings
-SET_WALLPAPER_SCRIPT="$POSTSCRIPTS_PATH/wallpaper.sh"
-VSCODE_SETTINGS_FILE="$XDG_CONFIG_HOME/Code/User/settings.json"
-ATTR_NAMES=("background" "foreground" "cursor" "selection-background" "selection-foreground" \
-"black" "black-hg" "red" "red-hg" "green" "green-hg" "yellow" "yellow-hg" "blue" "blue-hg" "magenta" "magenta-hg" "cyan" "cyan-hg" "white" "white-hg")
-
 # •• Colors
 R="\e[1;31m"
 G="\e[1;32m"
@@ -36,6 +22,30 @@ W_B="\e[1m"
 I_B="\e[1;3m" # Italic
 U_B="\e[1;4m" # Underline
 B_B="\e[1;7m" # With background
+
+if [ -z "$XDG_CONFIG_HOME" ]; then
+  echo -e "\n${R}[!]${W} XDG_CONFIG_HOME not set. Please export it in your shell's config file.\n"
+  exit 1
+fi
+
+GTHEME_PATH=$XDG_CONFIG_HOME/gtheme
+THEMES_PATH=$GTHEME_PATH/themes
+PATTERNS_PATH=$GTHEME_PATH/patterns
+ACTIVE_PATTERNS_PATH=$GTHEME_PATH/patterns/active-patterns
+POSTSCRIPTS_PATH=$GTHEME_PATH/post-scripts
+CURRENT_THEME_FILE=$GTHEME_PATH/current-theme
+FAV_THEMES_FILE=$GTHEME_PATH/fav-themes
+
+if [ ! -e $GTHEME_PATH ]; then
+  echo -e "\n${R}[!]${W} Gtheme folder not found! Ensure that the main project folder exists in ${W_B}$XDG_CONFIG_HOME/gtheme${W}.\n"
+  exit 1
+fi
+
+# •• Global Settings
+SET_WALLPAPER_SCRIPT="$POSTSCRIPTS_PATH/wallpaper.sh"
+VSCODE_SETTINGS_FILE="$XDG_CONFIG_HOME/Code/User/settings.json"
+ATTR_NAMES=("background" "foreground" "cursor" "selection-background" "selection-foreground" \
+"black" "black-hg" "red" "red-hg" "green" "green-hg" "yellow" "yellow-hg" "blue" "blue-hg" "magenta" "magenta-hg" "cyan" "cyan-hg" "white" "white-hg")
 
 trap ctrl_c INT
 function ctrl_c() {
