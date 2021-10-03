@@ -16,10 +16,6 @@ It also supports:
 
 ![Demo](screenshots/demo.gif)
 
-### Examples
-
-![Gif](screenshots/gif.gif)
-
 ***
 
 ## Wiki
@@ -57,6 +53,10 @@ Before, the value of the key `WALLPAPER_URL` inside the script will be replaced 
 You can reference this new script in your WM configuration file to set it after every boot.
 
 ***
+
+### Examples
+
+![Gif](screenshots/gif.gif)
 
 ## Credits
 
