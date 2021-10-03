@@ -33,6 +33,10 @@ GR="\e[0;2m"
 W="\e[0m"
 W_B="\e[1m"
 
+I_B="\e[1;3m" # Italic
+U_B="\e[1;4m" # Underline
+B_B="\e[1;7m" # With background
+
 trap ctrl_c INT
 function ctrl_c() {
   echo -e "\n${R}[!]${W} Exiting...\n"
@@ -150,7 +154,7 @@ function fillPattern() {
 
   echo -e "${B}•${W} Theme applied to ${G}$1${W}\n"
 
-  echo -e "---------------------\n"
+  echo -e "─────────────────────\n"
 }
 
 function generateFiles() {
@@ -216,161 +220,12 @@ function showFavThemes() {
 
 function list() {
   case "$1" in
-    "themes") showAllThemes "$(ls -p $THEMES_PATH | grep -v /)"; exit 0;;
-    "patterns") showPatterns "$(ls -p $PATTERNS_PATH | grep -v /)"; exit 0;;
-    "favs") showFavThemes; exit 0;;
+    "themes") showAllThemes "$(ls -p $THEMES_PATH | grep -v /)";;
+    "patterns") showPatterns "$(ls -p $PATTERNS_PATH | grep -v /)";;
+    "favs") showFavThemes;;
     *) echo -e "\n${R}[!]${W} Invalid option ${W_B}$1${W}!\n"; exit 1;;
   esac
 }
-
-function keyInput() {
-  read -rsn1 mode
-  if [ "$mode" == $'\x1b' ]; then
-    read -rsn2 mode
-  fi
-
-  case $mode in
-    '[A') echo "up";;
-    '[B') echo "down";;
-    '') echo "enter";;
-    'f') echo "f";;
-    'q') echo "q";;
-    'h') echo "h";;
-    'v') echo "v";;
-    'w') echo "w";;
-    *) echo invalid
-  esac
-}
-
-function showInteractiveHelp() {
-  while true; do
-    clear
-
-    echo -e "${W_B}OPTIONS${W}\n"
-    echo -e "  ${B}'enter'${W}      apply theme"
-    echo -e "  ${B}'arrow up'${W}   previous theme"
-    echo -e "  ${B}'arrow down'${W} next theme"
-    echo -e "  ${B}'q'${W}          quit"
-    echo -e "  ${B}'f'${W}          flag/unflag as favourite"
-    echo -e "  ${B}'w'${W}          apply/not apply wallpaper"
-    echo -e "  ${B}'v'${W}          apply/not apply vscode theme"
-    echo -e "  ${B}'h'${W}          show/hide this panel"
-
-    INPUT=$(keyInput)
-    [ "$INPUT" == "h" ] && break
-    [ "$INPUT" == "q" ] && ctrl_c
-  done
-}
-
-function showFlagStatus() {
-  echo -en "\nVSCode "
-  if [ $IS_VSCODE -eq 0 ]; then
-    echo -en "${G}• ON${W}"
-  else
-    echo -en "${R}• OFF${W}"
-  fi
-  echo -en "\nWallpaper "
-  if [ $IS_WALLPAPER -eq 0 ]; then
-    echo -e "${G}• ON${W}"
-  else
-    echo -e "${R}• OFF${W}"
-  fi
-}
-
-function showThemes() {
-  declare -i NUM_ELEMS=20
-
-  declare -i c=$(( $THEME_IDX - $NUM_ELEMS/2 - 1 ))
-  [ $(( $c + $NUM_ELEMS + 2 )) -gt $TOTAL_THEMES ] && (( c = $TOTAL_THEMES - $NUM_ELEMS - 2 ))
-
-  declare -i SHOWN_ELEMS=0
-
-  while [ $SHOWN_ELEMS -le $(( $NUM_ELEMS )) ]; do
-    (( c += 1 ))
-    [ $c -lt 0 ] && continue
-
-    if [ $c -eq $THEME_IDX ]; then
-      echo -e "${B}•${W} ${W_B}${COLOR_SCHEMES[$c]} ${G}↓ ${Y}↑${W}"
-    else
-      echo -e "${GR}• ${COLOR_SCHEMES[$c]}${W}"
-    fi
-
-    (( SHOWN_ELEMS += 1 ))
-  done
-}
-
-function interactiveLoop() {
-  declare -a COLOR_SCHEMES=( $(ls $THEMES_PATH | sed 's/.colors//g') )
-  declare -i THEME_IDX=0
-  declare THEME_NAME
-  declare INPUT
-
-  tput civis
-  echo
-  while true; do
-    clear
-
-    echo -e "${R} ██████╗ ${G} ████████╗${Y} ██╗  ██╗${B} ███████╗${M} ███╗   ███╗${C} ███████╗${W}"
-    echo -e "${R}██╔════╝ ${G} ╚══██╔══╝${Y} ██║  ██║${B} ██╔════╝${M} ████╗ ████║${C} ██╔════╝${W}"
-    echo -e "${R}██║  ███╗${G}    ██║   ${Y} ███████║${B} █████╗  ${M} ██╔████╔██║${C} █████╗  ${W}"
-    echo -e "${R}██║   ██║${G}    ██║   ${Y} ██╔══██║${B} ██╔══╝  ${M} ██║╚██╔╝██║${C} ██╔══╝  ${W}"
-    echo -e "${R}╚██████╔╝${G}    ██║   ${Y} ██║  ██║${B} ███████╗${M} ██║ ╚═╝ ██║${C} ███████╗${W}"
-    echo -e "${R} ╚═════╝ ${G}    ╚═╝   ${Y} ╚═╝  ╚═╝${B} ╚══════╝${M} ╚═╝     ╚═╝${C} ╚══════╝${W}"
-    echo -e "\n"
-
-    showThemes $THEME_IDX
-    showFlagStatus
-
-    THEME_NAME=${COLOR_SCHEMES[$THEME_IDX]}
-    INPUT=$(keyInput)
-    case $INPUT in
-      'up')
-        [ $THEME_IDX -gt 0 ] && (( THEME_IDX -= 1 ));;
-      'down')
-        [ $THEME_IDX -lt $(( $TOTAL_THEMES - 1 )) ] && (( THEME_IDX += 1 ));;
-      'enter')
-        echo -e "\n${B}Applying...${W}"
-        generateFiles "$1" "$2" $THEME_NAME &>/dev/null;;
-      'f') 
-        flagAsFavourite $THEME_NAME
-        sleep 1;;
-      'v')
-        IS_VSCODE=$(( ! $IS_VSCODE ));;
-      'w')
-        IS_WALLPAPER=$(( ! $IS_WALLPAPER ));;
-      'q') 
-        ctrl_c;;
-      'h')
-        showInteractiveHelp;;
-      *)
-        ;;
-    esac
-  done
-  tput cnorm
-}
-
-# function mainLoop() {
-# 	declare -a COLOR_SCHEMES=($(ls $THEMES_PATH))
-
-# 	declare -g TOTAL_THEMES
-# 	showAllThemes ${COLOR_SCHEMES[@]}
-
-# 	while true; do
-# 		read -p "Select a color scheme: (q to quit) " res
-
-# 		([ "$res" == "q" ] || [ "$res" == "Q" ]) && ctrl_c
-
-# 		if [[ ! -n $res || $res -ge $TOTAL_THEMES ]]; then
-# 			echo -e "\n${R}[!]${W} Invalid option!\n"
-# 			continue
-# 		fi
-
-# 		declare THEME_NAME=${COLOR_SCHEMES[$res]}
-# 		generateFiles "$1" "$2" ${THEME_NAME::-7}
-
-# 		showAllThemes ${COLOR_SCHEMES[@]}
-# 	done
-# }
 
 function flagAsFavourite() {
   declare -a FAV_THEMES=($@)
@@ -406,8 +261,6 @@ function addPatterns() {
       echo -e "${R}•${W} Error while activating the pattern $pattern!\n"
     fi
   done
-
-  exit 0
 }
 
 function removePatterns() {
@@ -428,8 +281,6 @@ function removePatterns() {
       echo -e "${R}•${W} Error while desactivating the pattern $pattern!\n"
     fi
   done
-
-  exit 0;
 }
 
 function checkPatterns() {
@@ -454,21 +305,349 @@ function checkThemes() {
   done
 }
 
+# INTERACTIVE SECTION
+
+function gthemeLogo() {
+  echo -e "${R} ██████╗ ${G} ████████╗${Y} ██╗  ██╗${B} ███████╗${M} ███╗   ███╗${C} ███████╗${W}"
+  echo -e "${R}██╔════╝ ${G} ╚══██╔══╝${Y} ██║  ██║${B} ██╔════╝${M} ████╗ ████║${C} ██╔════╝${W}"
+  echo -e "${R}██║  ███╗${G}    ██║   ${Y} ███████║${B} █████╗  ${M} ██╔████╔██║${C} █████╗  ${W}"
+  echo -e "${R}██║   ██║${G}    ██║   ${Y} ██╔══██║${B} ██╔══╝  ${M} ██║╚██╔╝██║${C} ██╔══╝  ${W}"
+  echo -e "${R}╚██████╔╝${G}    ██║   ${Y} ██║  ██║${B} ███████╗${M} ██║ ╚═╝ ██║${C} ███████╗${W}"
+  echo -e "${R} ╚═════╝ ${G}    ╚═╝   ${Y} ╚═╝  ╚═╝${B} ╚══════╝${M} ╚═╝     ╚═╝${C} ╚══════╝${W}"
+  echo -e "\n"
+}
+
+function keyInput() {
+  read -rsn1 mode
+  if [ "$mode" == $'\x1b' ]; then
+    read -rsn2 mode
+  fi
+
+  case $mode in
+    '[A') echo "up";;
+    '[B') echo "down";;
+    '[D') echo "left";;
+    '[C') echo "right";;
+    '') echo "enter";;
+    'f') echo "f";;
+    'q') echo "q";;
+    'h') echo "h";;
+    'v') echo "v";;
+    'w') echo "w";;
+    '1') echo "1";;
+    '2') echo "2";;
+    '3') echo "3";;
+    *) echo invalid
+  esac
+}
+
+function showPatternsHelp() {
+  while true; do
+    clear
+    gthemeLogo
+    echo -e "${Y}╭─── HELP ────────────────────────────────╮"
+    echo -e "${Y}│                                         │" 
+
+    echo -e "${Y}│  ${B}'enter'${W}  activate/desactivate pattern  ${Y}│"
+    echo -e "${Y}│  ${B}'up'${W}     previous pattern              ${Y}│"
+    echo -e "${Y}│  ${B}'down'${W}   next pattern                  ${Y}│"
+
+    showCommonHelp
+    [ $? -eq 1 ] && break
+  done
+}
+
+function showThemesHelp() {
+  while true; do
+    clear
+    gthemeLogo
+    echo -e "${Y}╭─── HELP ────────────────────────────────╮"
+    echo -e "${Y}│                                         │" 
+
+    echo -e "${Y}│  ${B}'enter'${W}  apply theme                   ${Y}│"
+    echo -e "${Y}│  ${B}'up'${W}     previous theme                ${Y}│"
+    echo -e "${Y}│  ${B}'down'${W}   next theme                    ${Y}│"
+    echo -e "${Y}│  ${B}'left'${W}   10 previous themes            ${Y}│"
+    echo -e "${Y}│  ${B}'right'${W}  10 next themes                ${Y}│" 
+    echo -e "${Y}│  ${B}'f'${W}      flag/unflag as favourite      ${Y}│"
+
+    showCommonHelp
+    [ $? -eq 1 ] && break
+  done
+}
+
+function showCommonHelp() {
+    echo -e "${Y}│  ${B}'w'${W}      apply/not apply wallpaper     ${Y}│"
+    echo -e "${Y}│  ${B}'v'${W}      apply/not apply vscode theme  ${Y}│"
+    echo -e "${Y}│  ${B}'q'${W}      quit                          ${Y}│"
+    echo -e "${Y}│  ${B}'h'${W}      show/hide this panel          ${Y}│"
+    echo -e "${Y}│  ${B}'1|2|3'${W}  theme|pattern|favs view       ${Y}│"
+
+    echo -e "${Y}╰─────────────────────────────────────────╯${W}"
+    INPUT=$(keyInput)
+    [ "$INPUT" == "h" ] && return 1
+    [ "$INPUT" == "q" ] && ctrl_c
+    return 0
+}
+
+function showFlagStatus() {
+  echo -e "${C}╭─── OPTIONS ─────╮"
+  echo -e "${C}│                 │"
+
+  echo -en "${C}│${W} Wallpaper "
+  if [ $IS_WALLPAPER -eq 0 ]; then
+    printf "${G}%-7s${W} ${C}│\n" "• ON"
+  else
+    printf "${R}%-7s${W} ${C}│\n" "• OFF"
+  fi
+  echo -en "${C}│${W} VSCode    "
+  if [ $IS_VSCODE -eq 0 ]; then
+    printf "${G}%-7s${W} ${C}│\n" "• ON"
+  else
+    printf "${R}%-7s${W} ${C}│\n" "• OFF"
+  fi
+  echo -e "${C}╰─────────────────╯${W}"
+}
+
+function showFavsInteractive() {
+  declare -a FAV_THEMES=( $(/bin/cat $FAV_THEMES_FILE) )
+  declare -i TOTAL_FAVS=${#FAV_THEMES[@]}
+  declare -i NUM_ELEMS=10
+  declare -i SHOWN_ELEMS=0
+
+  declare -i c=$(( $FAV_IDX - $NUM_ELEMS/2 - 1 ))
+  [ $(( $c + $NUM_ELEMS + 2 )) -gt $TOTAL_FAVS ] && (( c = $TOTAL_FAVS - $NUM_ELEMS - 2 ))
+
+  echo -e "${G}╭─── THEMES ──── PATTERNS ──── ${B_B}FAVS${W}${G} ───╮"
+  echo -e "${G}│                                      │"
+  while [ $SHOWN_ELEMS -le $(( $NUM_ELEMS )) ]; do
+    (( c += 1 ))
+    [ $c -lt 0 ] && continue
+
+    if [ $c -lt $TOTAL_FAVS ]; then
+      if [ $c -eq $FAV_IDX ]; then
+        printf "${G}│ ${G}‣ %-38s ${G}│\n" "${FAV_THEMES[$c]} ↓ ↑"
+      else
+        printf "${G}│ ${GR}  %-34s${W} ${G}│\n" "${FAV_THEMES[$c]}"
+      fi
+    fi
+
+    (( SHOWN_ELEMS += 1 ))
+  done
+  echo -e "${G}╰──────────────────────────────────────╯"
+
+  showFlagStatus
+
+  manageFavs
+}
+
+function manageFavs() {
+  THEME_NAME=${FAV_THEMES[$FAV_IDX]}
+  INPUT=$(keyInput)
+  case $INPUT in
+    'up')
+      [ $FAV_IDX -gt 0 ] && (( FAV_IDX -= 1 ));;
+    'down')
+      [ $FAV_IDX -lt $(( $TOTAL_FAVS - 1 )) ] && (( FAV_IDX += 1 ));;
+    'left')
+      [ $FAV_IDX -ge 10 ] && (( FAV_IDX -= 10 ));;
+    'right') 
+      [ $FAV_IDX -lt $(( $TOTAL_FAVS - 10 )) ] && (( FAV_IDX += 10 ));;
+    'enter')
+      echo -e "\n${B}Applying $THEME_NAME...${W}"
+      generateFiles "$1" "$2" $THEME_NAME &>/dev/null;;
+    'f')
+      flagAsFavourite $THEME_NAME
+      sleep 1;;
+    'v')
+      IS_VSCODE=$(( ! $IS_VSCODE ));;
+    'w')
+      IS_WALLPAPER=$(( ! $IS_WALLPAPER ));;
+    'q')
+      ctrl_c;;
+    'h')
+      showThemesHelp;;
+    '1'|'2'|'3')
+      CURRENT_WINDOW="$INPUT";;
+    *)
+      ;;
+  esac
+}
+
+function showPatternsInteractive() {
+  declare -i NUM_ELEMS=10
+  declare -i SHOWN_ELEMS=0
+
+  declare -i c=$(( $PATTERN_IDX - $NUM_ELEMS/2 - 1 ))
+  [ $(( $c + $NUM_ELEMS + 2 )) -gt $TOTAL_PATTERNS ] && (( c = $TOTAL_PATTERNS - $NUM_ELEMS - 2 ))
+
+  echo -e "${M}╭─── THEMES ──── ${B_B}PATTERNS${W}${M} ──── FAVS ───╮"
+  echo -e "${M}│                                      │"
+  while [ $SHOWN_ELEMS -le $(( $NUM_ELEMS )) ]; do
+    (( c += 1 ))
+    [ $c -lt 0 ] && continue
+
+    if [ $c -lt $TOTAL_PATTERNS ]; then
+      if [[ $c -eq $PATTERN_IDX ]]; then
+        printf "${M}│ ${M}‣ %-26s" "${PATTERNS[$c]} ↓ ↑"
+      else
+        printf "${M}│ ${GR}  %-22s${W}" "${PATTERNS[$c]}"
+      fi
+
+      if [ -e $ACTIVE_PATTERNS_PATH/${PATTERNS[$c]}.pattern ]; then
+        printf "${B}%-13s${M}│\n" "Active"
+      else
+        printf "${Y}%-13s${M}│\n" "Not Active"
+      fi
+    fi
+
+    (( SHOWN_ELEMS += 1 ))
+  done
+  echo -e "${M}╰──────────────────────────────────────╯"
+
+  showFlagStatus
+
+  managePatterns
+}
+
+function managePatterns() {
+  PATTERN_NAME=${PATTERNS[$PATTERN_IDX]}
+  INPUT=$(keyInput)
+  case $INPUT in
+    'up')
+      [ $PATTERN_IDX -gt 0 ] && (( PATTERN_IDX -= 1 ));;
+    'down')
+      [ $PATTERN_IDX -lt $(( $TOTAL_PATTERNS - 1 )) ] && (( PATTERN_IDX += 1 ));;
+    'enter')
+      if [ -e $ACTIVE_PATTERNS_PATH/$PATTERN_NAME.pattern ]; then
+        removePatterns $PATTERN_NAME &>/dev/null
+      else
+        addPatterns $PATTERN_NAME &>/dev/null
+      fi;;
+    'v')
+      IS_VSCODE=$(( ! $IS_VSCODE ));;
+    'w')
+      IS_WALLPAPER=$(( ! $IS_WALLPAPER ));;
+    'h')
+      showPatternsHelp;;
+    'q')
+      ctrl_c;;
+    '1'|'2'|'3')
+      CURRENT_WINDOW="$INPUT";;
+    *)
+      ;;
+  esac
+}
+
+function showThemesInteractive() {
+  declare -i NUM_ELEMS=20
+  declare -i SHOWN_ELEMS=0
+
+  declare -i c=$(( $THEME_IDX - $NUM_ELEMS/2 - 1 ))
+  [ $(( $c + $NUM_ELEMS + 2 )) -gt $TOTAL_THEMES ] && (( c = $TOTAL_THEMES - $NUM_ELEMS - 2 ))
+
+  echo -e "${B}╭─── ${B_B}THEMES${W}${B} ──── PATTERNS ──── FAVS ───╮"
+  echo -e "${B}│                                      │"
+  while [ $SHOWN_ELEMS -le $(( $NUM_ELEMS )) ]; do
+    (( c += 1 ))
+    [ $c -lt 0 ] && continue
+
+    if [ $c -lt $TOTAL_THEMES ]; then
+      if [ $c -eq $THEME_IDX ]; then
+        printf "${B}│ ${B}‣ %-38s ${B}│\n" "${THEMES[$c]} ↓ ↑"
+      else
+        printf "${B}│ ${GR}  %-34s${W} ${B}│\n" "${THEMES[$c]}"
+      fi
+    fi
+
+    (( SHOWN_ELEMS += 1 ))
+  done
+  echo -e "${B}╰──────────────────────────────────────╯"
+
+  showFlagStatus
+
+  manageThemes
+}
+
+function manageThemes() {
+  THEME_NAME=${THEMES[$THEME_IDX]}
+  INPUT=$(keyInput)
+  case $INPUT in
+    'up')
+      [ $THEME_IDX -gt 0 ] && (( THEME_IDX -= 1 ));;
+    'down')
+      [ $THEME_IDX -lt $(( $TOTAL_THEMES - 1 )) ] && (( THEME_IDX += 1 ));;
+    'left')
+      [ $THEME_IDX -ge 10 ] && (( THEME_IDX -= 10 ));;
+    'right') 
+      [ $THEME_IDX -lt $(( $TOTAL_THEMES - 10 )) ] && (( THEME_IDX += 10 ));;
+    'enter')
+      echo -e "\n${B}Applying $THEME_NAME...${W}"
+      generateFiles "$1" "$2" $THEME_NAME &>/dev/null;;
+    'f') 
+      flagAsFavourite $THEME_NAME
+      sleep 1;;
+    'v')
+      IS_VSCODE=$(( ! $IS_VSCODE ));;
+    'w')
+      IS_WALLPAPER=$(( ! $IS_WALLPAPER ));;
+    'q') 
+      ctrl_c;;
+    'h')
+      showThemesHelp;;
+    '1'|'2'|'3')
+      CURRENT_WINDOW="$INPUT";;
+    *)
+      ;;
+  esac
+}
+
+function interactiveLoop() {
+  declare -a THEMES=( $(ls $THEMES_PATH | sed 's/.colors//g') )
+  declare -i TOTAL_THEMES=${#THEMES[@]}
+
+  declare -a PATTERNS=( $(ls -p $PATTERNS_PATH | grep -v / | sed 's/.pattern//g') )
+  declare -i TOTAL_PATTERNS=${#PATTERNS[@]}
+
+  declare -i THEME_IDX=0
+  declare -i PATTERN_IDX=0
+  declare -i FAV_IDX=0
+  declare CURRENT_WINDOW="1"
+
+  tput civis
+  echo
+  while true; do
+    clear
+    gthemeLogo
+    case $CURRENT_WINDOW in
+      "1")
+        showThemesInteractive;;
+      "2")
+        showPatternsInteractive;;
+      "3")
+        showFavsInteractive;;
+    esac  
+  done
+  tput cnorm
+}
+
 declare -gi IS_VSCODE=1
 declare -gi IS_WALLPAPER=1
-declare -gi TOTAL_THEMES=$(ls $THEMES_PATH | wc -l)
 function main() {
   while getopts "l:hi:n:p:vwa:r:f:" opt; do
     case $opt in
       'l')
-        list $OPTARG;;
+        list $OPTARG
+        exit 0;;
       'h') 
         helpPanel
         exit 0;;
       'a')
-        addPatterns "$(echo $OPTARG | sed 's/,/ /g')";;
+        addPatterns "$(echo $OPTARG | sed 's/,/ /g')"
+        exit 0;;
       'r')
-        removePatterns "$(echo $OPTARG | sed 's/,/ /g')";;
+        removePatterns "$(echo $OPTARG | sed 's/,/ /g')"
+        exit 0;;
       'f')
         flagAsFavourite "$(echo $OPTARG | sed 's/,/ /g')"
         exit 0;;
@@ -482,7 +661,7 @@ function main() {
         IS_VSCODE=0;;
       'w')
         IS_WALLPAPER=0;;
-      *) 
+      *)
         helpPanel
         exit 1;;
     esac

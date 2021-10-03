@@ -12,6 +12,7 @@ It also supports:
 * Changing the wallpaper to match your new color scheme (**wallpaper collection included** 😉).
 * Changing the Visual Studio Code theme.
 
+![Demo](screenshots/demo.gif)
 
 ![Gif](screenshots/gif.gif)
 
