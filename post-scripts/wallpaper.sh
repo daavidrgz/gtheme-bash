@@ -1,6 +1,6 @@
 #!/bin/sh
 
-WALLPAPER_URL=~/.config/gtheme/wallpapers/Gruvbox/light-archlinux.png
+WALLPAPER_URL=~/.config/gtheme/wallpapers/Horizon/sunset-clouds.jpg
 feh --no-fehbg --bg-fill "$WALLPAPER_URL"
 
 # Flag to not execute the dm wallpaper update after every boot

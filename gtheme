@@ -330,6 +330,7 @@ function keyInput() {
     '[C') echo "right";;
     '') echo "enter";;
     'f') echo "f";;
+    'i') echo "i";;
     'q') echo "q";;
     'h') echo "h";;
     'v') echo "v";;
@@ -345,12 +346,13 @@ function showPatternsHelp() {
   while true; do
     clear
     gthemeLogo
-    echo -e "${Y}╭─── HELP ────────────────────────────────╮"
-    echo -e "${Y}│                                         │" 
+    echo -e "${Y}╭─── HELP ──────────────────────────────────╮"
+    echo -e "${Y}│                                           │" 
 
-    echo -e "${Y}│  ${B}'enter'${W}  activate/desactivate pattern  ${Y}│"
-    echo -e "${Y}│  ${B}'up'${W}     previous pattern              ${Y}│"
-    echo -e "${Y}│  ${B}'down'${W}   next pattern                  ${Y}│"
+    echo -e "${Y}│  ${B}'enter'${W}  activate/desactivate pattern    ${Y}│"
+    echo -e "${Y}│  ${B}'up'${W}     previous pattern                ${Y}│"
+    echo -e "${Y}│  ${B}'down'${W}   next pattern                    ${Y}│"
+    echo -e "${Y}│  ${B}'i'${W}      toggle invert pattern           ${Y}│"
 
     showCommonHelp
     [ $? -eq 1 ] && break
@@ -361,15 +363,15 @@ function showThemesHelp() {
   while true; do
     clear
     gthemeLogo
-    echo -e "${Y}╭─── HELP ────────────────────────────────╮"
-    echo -e "${Y}│                                         │" 
+    echo -e "${Y}╭─── HELP ──────────────────────────────────╮"
+    echo -e "${Y}│                                           │" 
 
-    echo -e "${Y}│  ${B}'enter'${W}  apply theme                   ${Y}│"
-    echo -e "${Y}│  ${B}'up'${W}     previous theme                ${Y}│"
-    echo -e "${Y}│  ${B}'down'${W}   next theme                    ${Y}│"
-    echo -e "${Y}│  ${B}'left'${W}   10 previous themes            ${Y}│"
-    echo -e "${Y}│  ${B}'right'${W}  10 next themes                ${Y}│" 
-    echo -e "${Y}│  ${B}'f'${W}      flag/unflag as favourite      ${Y}│"
+    echo -e "${Y}│  ${B}'enter'${W}  apply theme                     ${Y}│"
+    echo -e "${Y}│  ${B}'up'${W}     previous theme                  ${Y}│"
+    echo -e "${Y}│  ${B}'down'${W}   next theme                      ${Y}│"
+    echo -e "${Y}│  ${B}'left'${W}   10 previous themes              ${Y}│"
+    echo -e "${Y}│  ${B}'right'${W}  10 next themes                  ${Y}│" 
+    echo -e "${Y}│  ${B}'f'${W}      flag/unflag as favourite        ${Y}│"
 
     showCommonHelp
     [ $? -eq 1 ] && break
@@ -377,13 +379,13 @@ function showThemesHelp() {
 }
 
 function showCommonHelp() {
-    echo -e "${Y}│  ${B}'w'${W}      apply/not apply wallpaper     ${Y}│"
-    echo -e "${Y}│  ${B}'v'${W}      apply/not apply vscode theme  ${Y}│"
-    echo -e "${Y}│  ${B}'q'${W}      quit                          ${Y}│"
-    echo -e "${Y}│  ${B}'h'${W}      show/hide this panel          ${Y}│"
-    echo -e "${Y}│  ${B}'1|2|3'${W}  theme|pattern|favs view       ${Y}│"
+    echo -e "${Y}│  ${B}'w'${W}      apply/not apply wallpaper       ${Y}│"
+    echo -e "${Y}│  ${B}'v'${W}      apply/not apply vscode theme    ${Y}│"
+    echo -e "${Y}│  ${B}'q'${W}      quit                            ${Y}│"
+    echo -e "${Y}│  ${B}'h'${W}      show/hide this panel            ${Y}│"
+    echo -e "${Y}│  ${B}'1|2|3'${W}  theme|pattern|favs view         ${Y}│"
 
-    echo -e "${Y}╰─────────────────────────────────────────╯${W}"
+    echo -e "${Y}╰───────────────────────────────────────────╯${W}"
     INPUT=$(keyInput)
     [ "$INPUT" == "h" ] && return 1
     [ "$INPUT" == "q" ] && ctrl_c
@@ -418,23 +420,23 @@ function showFavsInteractive() {
   declare -i c=$(( $FAV_IDX - $NUM_ELEMS/2 - 1 ))
   [ $(( $c + $NUM_ELEMS + 2 )) -gt $TOTAL_FAVS ] && (( c = $TOTAL_FAVS - $NUM_ELEMS - 2 ))
 
-  echo -e "${G}╭─── THEMES ──── PATTERNS ──── ${B_B}FAVS${W}${G} ───╮"
-  echo -e "${G}│                                      │"
+  echo -e "${G}╭──── THEMES ──── PATTERNS ──── ${B_B}FAVS${W}${G} ────╮"
+  echo -e "${G}│                                        │"
   while [ $SHOWN_ELEMS -le $(( $NUM_ELEMS )) ]; do
     (( c += 1 ))
     [ $c -lt 0 ] && continue
 
     if [ $c -lt $TOTAL_FAVS ]; then
       if [ $c -eq $FAV_IDX ]; then
-        printf "${G}│ ${G}‣ %-38s ${G}│\n" "${FAV_THEMES[$c]} ↓ ↑"
+        printf "${G}│ ${G}‣ %-40s ${G}│\n" "${FAV_THEMES[$c]} ↓ ↑"
       else
-        printf "${G}│ ${GR}  %-34s${W} ${G}│\n" "${FAV_THEMES[$c]}"
+        printf "${G}│ ${GR}  %-36s${W} ${G}│\n" "${FAV_THEMES[$c]}"
       fi
     fi
 
     (( SHOWN_ELEMS += 1 ))
   done
-  echo -e "${G}╰──────────────────────────────────────╯"
+  echo -e "${G}╰────────────────────────────────────────╯"
 
   showFlagStatus
 
@@ -455,7 +457,7 @@ function manageFavs() {
       [ $FAV_IDX -lt $(( $TOTAL_FAVS - 10 )) ] && (( FAV_IDX += 10 ));;
     'enter')
       echo -e "\n${B}Applying $THEME_NAME...${W}"
-      generateFiles "$1" "$2" $THEME_NAME &>/dev/null;;
+      generateFiles "" "${INVERTED_PATTERNS[@]}" $THEME_NAME &>/dev/null;;
     'f')
       flagAsFavourite $THEME_NAME
       sleep 1;;
@@ -481,29 +483,35 @@ function showPatternsInteractive() {
   declare -i c=$(( $PATTERN_IDX - $NUM_ELEMS/2 - 1 ))
   [ $(( $c + $NUM_ELEMS + 2 )) -gt $TOTAL_PATTERNS ] && (( c = $TOTAL_PATTERNS - $NUM_ELEMS - 2 ))
 
-  echo -e "${M}╭─── THEMES ──── ${B_B}PATTERNS${W}${M} ──── FAVS ───╮"
-  echo -e "${M}│                                      │"
+  echo -e "${M}╭──── THEMES ──── ${B_B}PATTERNS${W}${M} ──── FAVS ────╮"
+  echo -e "${M}│                                        │"
   while [ $SHOWN_ELEMS -le $(( $NUM_ELEMS )) ]; do
     (( c += 1 ))
     [ $c -lt 0 ] && continue
 
     if [ $c -lt $TOTAL_PATTERNS ]; then
       if [[ $c -eq $PATTERN_IDX ]]; then
-        printf "${M}│ ${M}‣ %-26s" "${PATTERNS[$c]} ↓ ↑"
+        printf "${M}│ ${M}‣ %-25s" "${PATTERNS[$c]} ↓ ↑"
       else
-        printf "${M}│ ${GR}  %-22s${W}" "${PATTERNS[$c]}"
+        printf "${M}│ ${GR}  %-21s${W}" "${PATTERNS[$c]}"
       fi
 
       if [ -e $ACTIVE_PATTERNS_PATH/${PATTERNS[$c]}.pattern ]; then
-        printf "${B}%-13s${M}│\n" "Active"
+        printf "${B}%-11s" "Active"
       else
-        printf "${Y}%-13s${M}│\n" "Not Active"
+        printf "${Y}%-11s" "Not Active"
+      fi
+
+      if [[ " ${INVERTED_PATTERNS[@]} " =~ " ${PATTERNS[$c]} " ]]; then
+        printf "${C}%-5s${M}│\n" "Inv"
+      else
+        printf "%-5s${M}│\n" " "
       fi
     fi
 
     (( SHOWN_ELEMS += 1 ))
   done
-  echo -e "${M}╰──────────────────────────────────────╯"
+  echo -e "${M}╰────────────────────────────────────────╯"
 
   showFlagStatus
 
@@ -523,6 +531,14 @@ function managePatterns() {
         removePatterns $PATTERN_NAME &>/dev/null
       else
         addPatterns $PATTERN_NAME &>/dev/null
+      fi;;
+    'i')
+      if [[ " ${INVERTED_PATTERNS[*]} " =~ " $PATTERN_NAME " ]]; then
+        for i in ${!INVERTED_PATTERNS[@]}; do
+          [ "${INVERTED_PATTERNS[i]}" == "$PATTERN_NAME" ] && unset INVERTED_PATTERNS[i]
+        done
+      else
+        INVERTED_PATTERNS+=( "$PATTERN_NAME" )
       fi;;
     'v')
       IS_VSCODE=$(( ! $IS_VSCODE ));;
@@ -546,23 +562,23 @@ function showThemesInteractive() {
   declare -i c=$(( $THEME_IDX - $NUM_ELEMS/2 - 1 ))
   [ $(( $c + $NUM_ELEMS + 2 )) -gt $TOTAL_THEMES ] && (( c = $TOTAL_THEMES - $NUM_ELEMS - 2 ))
 
-  echo -e "${B}╭─── ${B_B}THEMES${W}${B} ──── PATTERNS ──── FAVS ───╮"
-  echo -e "${B}│                                      │"
+  echo -e "${B}╭──── ${B_B}THEMES${W}${B} ──── PATTERNS ──── FAVS ────╮"
+  echo -e "${B}│                                        │"
   while [ $SHOWN_ELEMS -le $(( $NUM_ELEMS )) ]; do
     (( c += 1 ))
     [ $c -lt 0 ] && continue
 
     if [ $c -lt $TOTAL_THEMES ]; then
       if [ $c -eq $THEME_IDX ]; then
-        printf "${B}│ ${B}‣ %-38s ${B}│\n" "${THEMES[$c]} ↓ ↑"
+        printf "${B}│ ${B}‣ %-40s ${B}│\n" "${THEMES[$c]} ↓ ↑"
       else
-        printf "${B}│ ${GR}  %-34s${W} ${B}│\n" "${THEMES[$c]}"
+        printf "${B}│ ${GR}  %-36s${W} ${B}│\n" "${THEMES[$c]}"
       fi
     fi
 
     (( SHOWN_ELEMS += 1 ))
   done
-  echo -e "${B}╰──────────────────────────────────────╯"
+  echo -e "${B}╰────────────────────────────────────────╯"
 
   showFlagStatus
 
@@ -583,7 +599,7 @@ function manageThemes() {
       [ $THEME_IDX -lt $(( $TOTAL_THEMES - 10 )) ] && (( THEME_IDX += 10 ));;
     'enter')
       echo -e "\n${B}Applying $THEME_NAME...${W}"
-      generateFiles "$1" "$2" $THEME_NAME &>/dev/null;;
+      generateFiles "" "${INVERTED_PATTERNS[@]}" $THEME_NAME &>/dev/null;;
     'f') 
       flagAsFavourite $THEME_NAME
       sleep 1;;
@@ -603,6 +619,8 @@ function manageThemes() {
 }
 
 function interactiveLoop() {
+  declare -a INVERTED_PATTERNS=()
+
   declare -a THEMES=( $(ls $THEMES_PATH | sed 's/.colors//g') )
   declare -i TOTAL_THEMES=${#THEMES[@]}
 
@@ -671,7 +689,7 @@ function main() {
   INVERTED_PATTERNS="$(echo $INVERTED_PATTERNS | sed 's/,/ /g')"
   checkPatterns "$PATTERNS $INVERTED_PATTERNS"
 
-  [ -z "$THEME_NAME" ] && interactiveLoop "$PATTERNS" "$INVERTED_PATTERNS"
+  [ -z "$THEME_NAME" ] && interactiveLoop
 
   checkThemes $THEME_NAME
   generateFiles "$PATTERNS" "$INVERTED_PATTERNS" $THEME_NAME
