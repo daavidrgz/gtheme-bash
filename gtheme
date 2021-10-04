@@ -37,13 +37,13 @@ CURRENT_THEME_FILE=$GTHEME_PATH/current-theme
 FAV_THEMES_FILE=$GTHEME_PATH/fav-themes
 
 if [ ! -e $GTHEME_PATH ]; then
-  echo -e "\n${R}[!]${W} Gtheme folder not found! Ensure that the main project folder exists in ${W_B}$XDG_CONFIG_HOME/gtheme${W}.\n"
+  echo -e "\n${R}[!]${W} Gtheme folder not found! Ensure that ${W_B}$XDG_CONFIG_HOME/gtheme${W} folder exists.\n"
   exit 1
 fi
 
 # •• Global Settings
-SET_WALLPAPER_SCRIPT="$POSTSCRIPTS_PATH/wallpaper.sh"
 VSCODE_SETTINGS_FILE="$XDG_CONFIG_HOME/Code/User/settings.json"
+SET_WALLPAPER_SCRIPT="$POSTSCRIPTS_PATH/wallpaper.sh"
 ATTR_NAMES=("background" "foreground" "cursor" "selection-background" "selection-foreground" \
 "black" "black-hg" "red" "red-hg" "green" "green-hg" "yellow" "yellow-hg" "blue" "blue-hg" "magenta" "magenta-hg" "cyan" "cyan-hg" "white" "white-hg")
 
@@ -168,9 +168,9 @@ function fillPattern() {
 }
 
 function generateFiles() {
-  declare PATTERNS="$1"
+  declare -r THEME_NAME="$1"
   declare -r INVERTED_PATTERNS="$2"
-  declare -r THEME_NAME="$3"
+  declare PATTERNS="$3"
 
   [ -z "$PATTERNS" ] && PATTERNS="$(ls $ACTIVE_PATTERNS_PATH | sed 's/.pattern//g' )"
 
@@ -467,7 +467,7 @@ function manageFavs() {
       [ $FAV_IDX -lt $(( $TOTAL_FAVS - 10 )) ] && (( FAV_IDX += 10 ));;
     'enter')
       echo -e "\n${B}Applying $THEME_NAME...${W}"
-      generateFiles "" "${INVERTED_PATTERNS[@]}" $THEME_NAME &>/dev/null;;
+      generateFiles $THEME_NAME "${INVERTED_PATTERNS[@]}" "" &>/dev/null;;
     'f')
       flagAsFavourite $THEME_NAME
       sleep 1;;
@@ -609,7 +609,7 @@ function manageThemes() {
       [ $THEME_IDX -lt $(( $TOTAL_THEMES - 10 )) ] && (( THEME_IDX += 10 ));;
     'enter')
       echo -e "\n${B}Applying $THEME_NAME...${W}"
-      generateFiles "" "${INVERTED_PATTERNS[@]}" $THEME_NAME &>/dev/null;;
+      generateFiles $THEME_NAME "${INVERTED_PATTERNS[@]}" "" &>/dev/null;;
     'f') 
       flagAsFavourite $THEME_NAME
       sleep 1;;
@@ -702,7 +702,7 @@ function main() {
   [ -z "$THEME_NAME" ] && interactiveLoop
 
   checkThemes $THEME_NAME
-  generateFiles "$PATTERNS" "$INVERTED_PATTERNS" $THEME_NAME
+  generateFiles $THEME_NAME "$INVERTED_PATTERNS" "$PATTERNS"
 }
 
 main "$@"
