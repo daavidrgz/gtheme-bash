@@ -3,6 +3,6 @@
 ;; %theme-name%
 
 [color]
-;; background = %background%
+;; background = #%background%
 background = #00000000
-foreground = %background%
+foreground = #%background%

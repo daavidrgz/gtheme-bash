@@ -1,7 +1,10 @@
 #!/bin/bash
 
-while pgrep -u $UID -x polybar >/dev/null; do
+while pgrep -u $UID -x polybar &>/dev/null; do
 	killall -q polybar
 	sleep 1
 done
-polybar -r -q main -c $HOME/.config/polybar/config.ini &
+polybar -q main -c $HOME/.config/polybar/config.ini &
+disown
+
+exit 0

@@ -1,30 +1,30 @@
-background: #f7f7f7
-foreground: #494542
-cursor: #494542
-selection-background: #a4a1a1
-selection-foreground: #f7f7f7
+background: f7f7f7
+foreground: 494542
+cursor: 494542
+selection-background: a4a1a1
+selection-foreground: f7f7f7
 
-black: #090200
-black-hg: #5b5754
+black: 090200
+black-hg: 5b5754
 
-red: #da2c20
-red-hg: #e8bacf
+red: da2c20
+red-hg: e8bacf
 
-green: #00a152
-green-hg: #3a3332
+green: 00a152
+green-hg: 3a3332
 
-yellow: #fcec02
-yellow-hg: #494542
+yellow: fcec02
+yellow-hg: 494542
 
-blue: #00a0e4
-blue-hg: #7f7c7b
+blue: 00a0e4
+blue-hg: 7f7c7b
 
-magenta: #a06994
-magenta-hg: #d6d4d3
+magenta: a06994
+magenta-hg: d6d4d3
 
-cyan: #b5e4f4
-cyan-hg: #ccab53
+cyan: b5e4f4
+cyan-hg: ccab53
 
-white: #a4a1a1
-white-hg: #f7f7f7
+white: a4a1a1
+white-hg: f7f7f7
 

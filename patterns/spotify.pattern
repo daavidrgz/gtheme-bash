@@ -1,0 +1,48 @@
+%output-file%=/home/david/.config/spicetify/Themes/Sleek/color.ini
+
+; %theme-name%
+
+[Custom]
+text               = %blue%
+subtext            = %foreground%
+button-text        = D8DEE9
+main               = %background%
+sidebar            = %background%
+player             = %background%
+card               = %background%
+shadow             = 0e0e13
+selected-row       = %black-hg%
+sub-button         = %blue%
+button             = %blue%
+button-active      = %green%
+button-disabled    = %background%
+sidebar-button     = %green%
+play-button        = %blue%
+tab-active         = %background%
+notification       = %background%
+notification-error = %background%
+playback-bar       = %blue%
+misc               = FFFFFF
+
+; Description
+
+; text = main text, playlist names in main field, name of playlist selected in sidebar, headings
+; subtext = text in main buttons in sidebar, playlist names in sidebar, artist names, and mini infos
+; button-text = text in main buttons in sidebar when active
+; main = main field or main bg
+; sidebar = sidebar bg
+; player = player bg
+; card = card bg
+; shadow = bg of buttons like account, pop-up lyrics, full app display in main field
+; selected-row = bg color of the song selected
+; sub-button = download and options button
+; button = playlist buttons bg in sidebar, drop-down menus, now playing song, like button
+; button-active = hover on song selected
+; button-disabled = seekbar bg, volume bar bg, scrollbar
+; sidebar-button = sidebar buttons bg
+; play-button = color of main play button in main field
+; tab-active = button bg in main field (playlists, podcasts, artists, albums)
+; notification = notification ('Added to liked songs' etc.)
+; notification-error = error
+; playback-bar = seekbar fg, main play/pause button bg
+; misc = miscellaneous

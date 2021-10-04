@@ -134,7 +134,7 @@ function fillPattern() {
   fi
 
   cp $PATTERN $DEST
-  
+
   declare -r CONTENT="$(/bin/cat $THEMES_PATH/$2.colors)"
   for attr in ${ATTR_NAMES[@]}; do
     declare VALUE=$(echo "$CONTENT" | grep -e "^$attr:.*" | awk -F ': ' '{print $2}')
@@ -389,8 +389,8 @@ function showThemesHelp() {
 }
 
 function showCommonHelp() {
-    echo -e "${Y}│  ${B}'w'${W}      apply/not apply wallpaper       ${Y}│"
-    echo -e "${Y}│  ${B}'v'${W}      apply/not apply vscode theme    ${Y}│"
+    echo -e "${Y}│  ${B}'w'${W}      toggle apply wallpaper          ${Y}│"
+    echo -e "${Y}│  ${B}'v'${W}      toggle apply vscode theme       ${Y}│"
     echo -e "${Y}│  ${B}'q'${W}      quit                            ${Y}│"
     echo -e "${Y}│  ${B}'h'${W}      show/hide this panel            ${Y}│"
     echo -e "${Y}│  ${B}'1|2|3'${W}  theme|pattern|favs view         ${Y}│"

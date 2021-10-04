@@ -1,32 +1,32 @@
 vscode: Horizon Dark
 wallpaper: ~/.config/gtheme/wallpapers/Horizon/sunset-clouds.jpg
 
-background: #1C1E26
-foreground: #BABABA
-cursor: #BABABA
-selection-background: #07DA8C
-selection-foreground: #1C1E26
+background: 1C1E26
+foreground: BABABA
+cursor: BABABA
+selection-background: 07DA8C
+selection-foreground: 1C1E26
 
-black: #676767
-black-hg: #676767
+black: 676767
+black-hg: 676767
 
-red: #EC6A88
-red-hg: #EC6A88
+red: EC6A88
+red-hg: EC6A88
 
-green: #29D398
-green-hg: #3FDAA4
+green: 29D398
+green-hg: 3FDAA4
 
-yellow: #FAB795
-yellow-hg: #FBC3A7
+yellow: FAB795
+yellow-hg: FBC3A7
 
-blue: #e95678
-blue-hg: #3FC6DE
+blue: e95678
+blue-hg: 3FC6DE
 
-magenta: #b877db
-magenta-hg: #b877db
+magenta: b877db
+magenta-hg: b877db
 
-cyan: #25b0bc
-cyan-hg: #6BE6E6
+cyan: 25b0bc
+cyan-hg: 6BE6E6
 
-white: #FEFFFF
-white-hg: #FEFFFF
+white: FEFFFF
+white-hg: FEFFFF

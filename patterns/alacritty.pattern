@@ -1,4 +1,5 @@
 %output-file%=/home/david/.config/alacritty/alacritty.yml
+# %theme-name%
 
 window:
   padding:
@@ -26,29 +27,29 @@ cursor:
 
 colors:
   cursor:
-    text: "%foreground%"
-    cursor: "%cursor%"
+    text: "#%foreground%"
+    cursor: "#%cursor%"
   selection:
-    text: "%background%"
-    background: "%selection-background%"
+    text: "#%background%"
+    background: "#%selection-background%"
   primary:
-    background: "%background%"
-    foreground: "%foreground%"
+    background: "#%background%"
+    foreground: "#%foreground%"
   normal:
-    black: "%black%"
-    red: "%red%"
-    green: "%green%"
-    yellow: "%yellow%"
-    blue: "%blue%"
-    magenta: "%magenta%"
-    cyan: "%cyan%"
-    white: "%white%"
+    black: "#%black%"
+    red: "#%red%"
+    green: "#%green%"
+    yellow: "#%yellow%"
+    blue: "#%blue%"
+    magenta: "#%magenta%"
+    cyan: "#%cyan%"
+    white: "#%white%"
   bright:
-    black: "%black-hg%"
-    red: "%red-hg%"
-    green: "%green-hg%"
-    yellow: "%yellow-hg%"
-    blue: "%blue-hg%"
-    magenta: "%magenta-hg%"
-    cyan: "%cyan-hg%"
-    white: "%white-hg%"
+    black: "#%black-hg%"
+    red: "#%red-hg%"
+    green: "#%green-hg%"
+    yellow: "#%yellow-hg%"
+    blue: "#%blue-hg%"
+    magenta: "#%magenta-hg%"
+    cyan: "#%cyan-hg%"
+    white: "#%white-hg%"
