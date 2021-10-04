@@ -1,8 +1,8 @@
 background: fefbec
 foreground: 6e6b5e
 cursor: 6e6b5e
-selection-background: 
-selection-foreground: 
+selection-background: 6e6b5e 
+selection-foreground: fefbec 
 
 black: 20201d
 black-hg: 7d7a68

@@ -1,8 +1,8 @@
 background: 1d1f21
 foreground: c5c8c6
 cursor: c5c8c6
-selection-background: 
-selection-foreground: 
+selection-background: c5c8c6 
+selection-foreground: 1d1f21 
 
 black: 1d1f21
 black-hg: 969896

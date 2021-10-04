@@ -5,7 +5,7 @@ background: e8e9ec
 foreground: 33374c
 cursor: 
 selection-background: 33374c
-selection-foreground: 
+selection-foreground: e8e9ec 
 
 black: dcdfe7
 black-hg: 8389a3

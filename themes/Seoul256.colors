@@ -2,7 +2,7 @@ background: 3a3a3a
 foreground: d0d0d0
 cursor: 
 selection-background: d0d0d0
-selection-foreground: 
+selection-foreground: 3a3a3a 
 
 black: 4e4e4e
 black-hg: 626262

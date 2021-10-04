@@ -1,8 +1,8 @@
 background: 000000
 foreground: ababab
 cursor: ababab
-selection-background: 
-selection-foreground: 
+selection-background: ababab 
+selection-foreground: 000000 
 
 black: 000000
 black-hg: 343434

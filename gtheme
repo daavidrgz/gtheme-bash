@@ -80,7 +80,7 @@ function executePostScript() {
     return
   fi
 
-  $POSTSCRIPTS_PATH/$APP_NAME.sh $2
+  $POSTSCRIPTS_PATH/$APP_NAME.sh $2 &
 }
 
 function setWallpaper() {

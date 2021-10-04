@@ -2,7 +2,7 @@ background: 333333
 foreground: F2F2F2
 cursor: 
 selection-background: F2F2F2
-selection-foreground: 
+selection-foreground: 333333 
 
 black: 333333
 black-hg: 88807C

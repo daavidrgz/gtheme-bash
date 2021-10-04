@@ -2,7 +2,7 @@ background: 222324
 foreground: BABABA
 cursor: 
 selection-background: BABABA
-selection-foreground: 
+selection-foreground: 222324 
 
 black: 000000
 black-hg: 666666

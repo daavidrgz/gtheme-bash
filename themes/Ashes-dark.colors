@@ -1,8 +1,8 @@
 background: 1C2023
 foreground: C7CCD1
 cursor: C7CCD1
-selection-background: 
-selection-foreground: 
+selection-background: C7CCD1 
+selection-foreground: 1C2023 
 
 black: 1C2023
 black-hg: 747C84

@@ -1,8 +1,8 @@
 background: DBD6D1
 foreground: 433B32
 cursor: 433B32
-selection-background: 
-selection-foreground: 
+selection-background: 433B32 
+selection-foreground: DBD6D1 
 
 black: 16130F
 black-hg: 5A5047

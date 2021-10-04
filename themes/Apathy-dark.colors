@@ -1,8 +1,8 @@
 background: 031A16
 foreground: 81B5AC
 cursor: 81B5AC
-selection-background: 
-selection-foreground: 
+selection-background: 81B5AC 
+selection-foreground: 031A16 
 
 black: 031A16
 black-hg: 2B685E

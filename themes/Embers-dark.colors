@@ -1,8 +1,8 @@
 background: 16130F
 foreground: A39A90
 cursor: A39A90
-selection-background: 
-selection-foreground: 
+selection-background: A39A90 
+selection-foreground: 16130F 
 
 black: 16130F
 black-hg: 5A5047

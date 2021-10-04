@@ -1,8 +1,8 @@
 background: 20201d
 foreground: a6a28c
 cursor: a6a28c
-selection-background: 
-selection-foreground: 
+selection-background: a6a28c 
+selection-foreground: 20201d 
 
 black: 20201d
 black-hg: 7d7a68

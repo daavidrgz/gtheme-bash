@@ -1,8 +1,8 @@
 background: 001100
 foreground: 00bb00
 cursor: 00bb00
-selection-background: 
-selection-foreground: 
+selection-background: 00bb00 
+selection-foreground: 001100 
 
 black: 001100
 black-hg: 007700

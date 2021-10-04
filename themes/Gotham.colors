@@ -3,8 +3,8 @@ vscode: Gotham
 background: 0a0f14
 foreground: 98d1ce
 cursor: 98d1ce
-selection-background: 
-selection-foreground: 
+selection-background: 98d1ce 
+selection-foreground: 0a0f14 
 
 black: 0a0f14
 black-hg: 10151b

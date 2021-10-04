@@ -1,8 +1,8 @@
 background: ECF0F1
 foreground: 7F8C8D
 cursor: 7F8C8D
-selection-background: 
-selection-foreground: 
+selection-background: 7F8C8D 
+selection-foreground: ECF0F1 
 
 black: 2C3E50
 black-hg: 95A5A6
