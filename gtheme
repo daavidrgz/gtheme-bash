@@ -30,11 +30,11 @@ fi
 
 GTHEME_PATH=$XDG_CONFIG_HOME/gtheme
 THEMES_PATH=$GTHEME_PATH/themes
+FAV_THEMES_PATH=$THEMES_PATH/fav-themes
 PATTERNS_PATH=$GTHEME_PATH/patterns
-ACTIVE_PATTERNS_PATH=$GTHEME_PATH/patterns/active-patterns
+ACTIVE_PATTERNS_PATH=$PATTERNS_PATH/active-patterns
 POSTSCRIPTS_PATH=$GTHEME_PATH/post-scripts
 CURRENT_THEME_FILE=$GTHEME_PATH/current-theme
-FAV_THEMES_FILE=$GTHEME_PATH/fav-themes
 
 if [ ! -e $GTHEME_PATH ]; then
   echo -e "\n${R}[!]${W} Gtheme folder not found! Ensure that ${W_B}$XDG_CONFIG_HOME/gtheme${W} folder exists.\n"
@@ -209,9 +209,7 @@ function showAllThemes() {
   echo
   for theme in "${COLOR_SCHEMES[@]}"; do
     declare FAV_COLOR=${W}
-    if /bin/cat $FAV_THEMES_FILE | grep -e "^${theme::-7}$" &>/dev/null; then
-      FAV_COLOR=${Y}
-    fi
+    [ -e $FAV_THEMES_PATH/$theme ] && FAV_COLOR=${Y}
 
     if /bin/cat $CURRENT_THEME_FILE | grep -e ": ${theme::-7}$" &>/dev/null; then
       printf "${B}%7s${W} ${FAV_COLOR}%s ${B}(active)${W}\n" "[$COUNT]" "• ${theme::-7}"
@@ -224,7 +222,7 @@ function showAllThemes() {
 }
 function showFavThemes() {
   echo
-  for theme in $(/bin/cat $FAV_THEMES_FILE); do
+  for theme in $(ls $FAV_THEMES_PATH | sed 's/\.colors//g'); do
     echo -e "${Y}•${W} $theme"
   done
   echo
@@ -245,11 +243,11 @@ function flagAsFavourite() {
 
   echo
   for theme in ${FAV_THEMES[@]}; do
-    if /bin/cat $FAV_THEMES_FILE | grep $theme &>/dev/null; then
-      sed -i "/$theme/d" $FAV_THEMES_FILE
+    if [ -e $FAV_THEMES_PATH/$theme.colors ]; then
+      rm $FAV_THEMES_PATH/$theme.colors
       echo -e "${G}[-]${W} Theme ${W_B}$theme${W} succesfully removed from favourites!\n"
     else
-      echo $theme >> $FAV_THEMES_FILE
+      ln -s $THEMES_PATH/$theme.colors $FAV_THEMES_PATH/$theme.colors
       echo -e "${G}[+]${W} Theme ${W_B}$theme${W} succesfully added to favourites!\n"
     fi
   done
@@ -434,7 +432,7 @@ function showFlagStatus() {
 }
 
 function showColorPreview() {
-  [ $COLOR_PREV -eq 1 ] && return
+  [[ $COLOR_PREV -eq 1 || -z "$1" ]] && return
   F_C=$2
 
   colors=( $(/bin/cat $THEMES_PATH/$1.colors | grep -Ee '^background:|^foreground:' | awk -F ': ' '{print $2}') )
@@ -458,8 +456,6 @@ function showColorPreview() {
 }
 
 function showFavsInteractive() {
-  declare -a FAV_THEMES=( $(/bin/cat $FAV_THEMES_FILE) )
-  declare -i TOTAL_FAVS=${#FAV_THEMES[@]}
   declare -i NUM_ELEMS=20
   declare -i SHOWN_ELEMS=0
 
@@ -486,7 +482,6 @@ function showFavsInteractive() {
   done
   echo -e "${G}╰────────────────────────────────────────╯${W}"
 
-
   showColorPreview "${FAV_THEMES[$FAV_IDX]}" "${G}"
 
   manageFavs
@@ -509,7 +504,9 @@ function manageFavs() {
       generateFiles $FAV_NAME "${INVERTED_PATTERNS[@]}" "" &>/dev/null;;
     'f')
       flagAsFavourite $FAV_NAME
-      sleep 1;;
+      FAV_THEMES=( $(ls $FAV_THEMES_PATH | sed 's/\.colors//g') )
+      TOTAL_FAVS=${#FAV_THEMES[@]}
+      [ $FAV_IDX -ge $TOTAL_FAVS ] && (( FAV_IDX = $TOTAL_FAVS - 1 ));;
     'e')
       ${VISUAL:-nano} "$THEMES_PATH/$FAV_NAME.colors"
       tput civis;;
@@ -661,6 +658,8 @@ function manageThemes() {
       generateFiles $THEME_NAME "${INVERTED_PATTERNS[@]}" "" &>/dev/null;;
     'f') 
       flagAsFavourite $THEME_NAME
+      FAV_THEMES=( $(ls $FAV_THEMES_PATH | sed 's/\.colors//g') )
+      TOTAL_FAVS=${#FAV_THEMES[@]}
       sleep 1;;
     'e')
       ${VISUAL:-nano} "$THEMES_PATH/$THEME_NAME.colors"
@@ -685,11 +684,14 @@ function manageThemes() {
 function interactiveLoop() {
   declare -a INVERTED_PATTERNS=()
 
-  declare -a THEMES=( $(ls $THEMES_PATH | sed 's/\.colors//g') )
+  declare -a THEMES=( $(ls -p $THEMES_PATH | grep -v / | sed 's/\.colors//g') )
   declare -i TOTAL_THEMES=${#THEMES[@]}
 
   declare -a PATTERNS=( $(ls -p $PATTERNS_PATH | grep -v / | sed 's/\.pattern//g') )
   declare -i TOTAL_PATTERNS=${#PATTERNS[@]}
+
+  declare -a FAV_THEMES=( $(ls $FAV_THEMES_PATH | sed 's/\.colors//g') )
+  declare -i TOTAL_FAVS=${#FAV_THEMES[@]}
 
   declare -i THEME_IDX=0
   declare -i PATTERN_IDX=0
