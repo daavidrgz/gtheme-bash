@@ -6,7 +6,7 @@
 # ██║   ██║   ██║   ██╔══██║██╔══╝  ██║╚██╔╝██║██╔══╝  
 # ╚██████╔╝   ██║   ██║  ██║███████╗██║ ╚═╝ ██║███████╗
 #  ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝
-# @daavidrgz
+# By David Rodríguez - @daavidrgz
 
 # •• Colors
 R="\e[1;31m"
@@ -15,16 +15,16 @@ Y="\e[1;33m"
 B="\e[1;34m"
 M="\e[1;35m"
 C="\e[1;36m"
-GR="\e[0;2m"
 W="\e[0m"
 W_B="\e[1m"
 
+DIM="\e[0;2m" # Dimmed
 I_B="\e[1;3m" # Italic
 U_B="\e[1;4m" # Underline
 B_B="\e[1;7m" # With background
 
 if [ -z "$XDG_CONFIG_HOME" ]; then
-  echo -e "\n${R}[!]${W} XDG_CONFIG_HOME not set. Please export it in your shell's config file.\n"
+  echo -e "\n${R}[!]${W} XDG_CONFIG_HOME not set. Please export it in your shell's config file (${W_B}export XDG_CONFIG_HOME=/home/***/.config${W}).\n"
   exit 1
 fi
 
@@ -49,7 +49,9 @@ ATTR_NAMES=("background" "foreground" "cursor" "selection-background" "selection
 
 trap ctrl_c INT
 function ctrl_c() {
-  echo -e "\n${R}[!]${W} Exiting...\n"
+  clear
+  gthemeLogo
+  echo -e "${R}[!]${W} Exiting...\n"
   tput cnorm
   exit 0
 }
@@ -80,7 +82,7 @@ function executePostScript() {
     return
   fi
 
-  $POSTSCRIPTS_PATH/$APP_NAME.sh $2 &
+  $POSTSCRIPTS_PATH/$APP_NAME.sh $2
 }
 
 function setWallpaper() {
@@ -340,6 +342,8 @@ function keyInput() {
     '[C') echo "right";;
     '') echo "enter";;
     'f') echo "f";;
+    'e') echo "e";;
+    'p') echo "p";;
     'i') echo "i";;
     'q') echo "q";;
     'h') echo "h";;
@@ -389,17 +393,19 @@ function showThemesHelp() {
 }
 
 function showCommonHelp() {
-    echo -e "${Y}│  ${B}'w'${W}      toggle apply wallpaper          ${Y}│"
-    echo -e "${Y}│  ${B}'v'${W}      toggle apply vscode theme       ${Y}│"
-    echo -e "${Y}│  ${B}'q'${W}      quit                            ${Y}│"
-    echo -e "${Y}│  ${B}'h'${W}      show/hide this panel            ${Y}│"
-    echo -e "${Y}│  ${B}'1|2|3'${W}  theme|pattern|favs view         ${Y}│"
+  echo -e "${Y}│  ${B}'e'${W}      edit file in \$VISUAL env var    ${Y}│"
+  echo -e "${Y}│  ${B}'p'${W}      toggle colors preview           ${Y}│"
+  echo -e "${Y}│  ${B}'w'${W}      toggle apply wallpaper          ${Y}│"
+  echo -e "${Y}│  ${B}'v'${W}      toggle apply vscode theme       ${Y}│"
+  echo -e "${Y}│  ${B}'q'${W}      quit                            ${Y}│"
+  echo -e "${Y}│  ${B}'h'${W}      show/hide this panel            ${Y}│"
+  echo -e "${Y}│  ${B}'1|2|3'${W}  themes|patterns|favs view       ${Y}│"
 
-    echo -e "${Y}╰───────────────────────────────────────────╯${W}"
-    INPUT=$(keyInput)
-    [ "$INPUT" == "h" ] && return 1
-    [ "$INPUT" == "q" ] && ctrl_c
-    return 0
+  echo -e "${Y}╰───────────────────────────────────────────╯${W}"
+  INPUT=$(keyInput)
+  [ "$INPUT" == "h" ] && return 1
+  [ "$INPUT" == "q" ] && ctrl_c
+  return 0
 }
 
 function showFlagStatus() {
@@ -418,13 +424,43 @@ function showFlagStatus() {
   else
     printf "${R}%-7s${W} ${C}│\n" "• OFF"
   fi
-  echo -e "${C}╰─────────────────╯${W}"
+  echo -en "${C}│${W} Preview   "
+  if [ $COLOR_PREV -eq 0 ]; then
+    printf "${G}%-7s${W} ${C}│\n" "• ON"
+  else
+    printf "${R}%-7s${W} ${C}│\n" "• OFF"
+  fi
+  echo -e "${C}╰─────────────────╯${W}\n"
+}
+
+function showColorPreview() {
+  [ $COLOR_PREV -eq 1 ] && return
+  F_C=$2
+
+  colors=( $(/bin/cat $THEMES_PATH/$1.colors | grep -Ee '^background:|^foreground:' | awk -F ': ' '{print $2}') )
+  colors+=( $(/bin/cat $THEMES_PATH/$1.colors | grep '\-hg' -B 1 | grep -v '\-hg' | awk -F ': ' '{print $2}') )
+
+  echo
+  echo -e "${F_C}╭─── PREVIEW ─────────────────────────────╮${W}"
+  echo -e "${F_C}│                                         │${W}"
+  E_COLORS=( $(perl -e 'foreach $a(@ARGV){print "\e[38:2::".join(":",unpack("C*",pack("H*",$a)))."m "};' "${colors[@]}") )
+  ART=("███" "▀▀▀")
+
+  for line_art in "${ART[@]}"; do
+    echo -en "${F_C}│ ${W}"
+    for color in ${E_COLORS[@]}; do
+      echo -en "$color$line_art\e[39m "
+    done
+    echo -e "${F_C}│${W}"
+  done
+  echo -e "${F_C}│${W}${W_B} Bg  Fg  Bl  Re  Gr  Ye  Bl  Ma  Cy  Wh  ${W}${F_C}│"
+  echo -e "${F_C}╰─────────────────────────────────────────╯${W}\n"
 }
 
 function showFavsInteractive() {
   declare -a FAV_THEMES=( $(/bin/cat $FAV_THEMES_FILE) )
   declare -i TOTAL_FAVS=${#FAV_THEMES[@]}
-  declare -i NUM_ELEMS=10
+  declare -i NUM_ELEMS=20
   declare -i SHOWN_ELEMS=0
 
   declare -i c=$(( $FAV_IDX - $NUM_ELEMS/2 - 1 ))
@@ -440,21 +476,24 @@ function showFavsInteractive() {
       if [ $c -eq $FAV_IDX ]; then
         printf "${G}│ ${G}‣ %-40s ${G}│\n" "${FAV_THEMES[$c]} ↓ ↑"
       else
-        printf "${G}│ ${GR}  %-36s${W} ${G}│\n" "${FAV_THEMES[$c]}"
+        printf "${G}│ ${DIM}  %-36s${W} ${G}│\n" "${FAV_THEMES[$c]}"
       fi
+    else
+      echo -e "${G}│                                        │"
     fi
 
     (( SHOWN_ELEMS += 1 ))
   done
-  echo -e "${G}╰────────────────────────────────────────╯"
+  echo -e "${G}╰────────────────────────────────────────╯${W}"
 
-  showFlagStatus
+
+  showColorPreview "${FAV_THEMES[$FAV_IDX]}" "${G}"
 
   manageFavs
 }
 
 function manageFavs() {
-  THEME_NAME=${FAV_THEMES[$FAV_IDX]}
+  FAV_NAME=${FAV_THEMES[$FAV_IDX]}
   INPUT=$(keyInput)
   case $INPUT in
     'up')
@@ -466,11 +505,16 @@ function manageFavs() {
     'right') 
       [ $FAV_IDX -lt $(( $TOTAL_FAVS - 10 )) ] && (( FAV_IDX += 10 ));;
     'enter')
-      echo -e "\n${B}Applying $THEME_NAME...${W}"
-      generateFiles $THEME_NAME "${INVERTED_PATTERNS[@]}" "" &>/dev/null;;
+      echo -e "\n${B}Applying $FAV_NAME...${W}"
+      generateFiles $FAV_NAME "${INVERTED_PATTERNS[@]}" "" &>/dev/null;;
     'f')
-      flagAsFavourite $THEME_NAME
+      flagAsFavourite $FAV_NAME
       sleep 1;;
+    'e')
+      ${VISUAL:-nano} "$THEMES_PATH/$FAV_NAME.colors"
+      tput civis;;
+    'p')
+      COLOR_PREV=$(( ! $COLOR_PREV ));;
     'v')
       IS_VSCODE=$(( ! $IS_VSCODE ));;
     'w')
@@ -487,7 +531,7 @@ function manageFavs() {
 }
 
 function showPatternsInteractive() {
-  declare -i NUM_ELEMS=10
+  declare -i NUM_ELEMS=20
   declare -i SHOWN_ELEMS=0
 
   declare -i c=$(( $PATTERN_IDX - $NUM_ELEMS/2 - 1 ))
@@ -503,7 +547,7 @@ function showPatternsInteractive() {
       if [[ $c -eq $PATTERN_IDX ]]; then
         printf "${M}│ ${M}‣ %-25s" "${PATTERNS[$c]} ↓ ↑"
       else
-        printf "${M}│ ${GR}  %-21s${W}" "${PATTERNS[$c]}"
+        printf "${M}│ ${DIM}  %-21s${W}" "${PATTERNS[$c]}"
       fi
 
       if [ -e $ACTIVE_PATTERNS_PATH/${PATTERNS[$c]}.pattern ]; then
@@ -517,13 +561,13 @@ function showPatternsInteractive() {
       else
         printf "%-5s${M}│\n" " "
       fi
+    else
+      echo -e "${M}│                                        │"
     fi
 
     (( SHOWN_ELEMS += 1 ))
   done
-  echo -e "${M}╰────────────────────────────────────────╯"
-
-  showFlagStatus
+  echo -e "${M}╰────────────────────────────────────────╯${W}"
 
   managePatterns
 }
@@ -550,6 +594,11 @@ function managePatterns() {
       else
         INVERTED_PATTERNS+=( "$PATTERN_NAME" )
       fi;;
+    'e')
+      ${VISUAL:-nano} "$PATTERNS_PATH/$PATTERN_NAME.pattern"
+      tput civis;;
+    'p')
+      COLOR_PREV=$(( ! $COLOR_PREV ));;
     'v')
       IS_VSCODE=$(( ! $IS_VSCODE ));;
     'w')
@@ -582,15 +631,15 @@ function showThemesInteractive() {
       if [ $c -eq $THEME_IDX ]; then
         printf "${B}│ ${B}‣ %-40s ${B}│\n" "${THEMES[$c]} ↓ ↑"
       else
-        printf "${B}│ ${GR}  %-36s${W} ${B}│\n" "${THEMES[$c]}"
+        printf "${B}│ ${DIM}  %-36s${W} ${B}│\n" "${THEMES[$c]}"
       fi
     fi
 
     (( SHOWN_ELEMS += 1 ))
   done
-  echo -e "${B}╰────────────────────────────────────────╯"
+  echo -e "${B}╰────────────────────────────────────────╯${W}"
 
-  showFlagStatus
+  showColorPreview "${THEMES[$THEME_IDX]}" "${B}"
 
   manageThemes
 }
@@ -613,6 +662,11 @@ function manageThemes() {
     'f') 
       flagAsFavourite $THEME_NAME
       sleep 1;;
+    'e')
+      ${VISUAL:-nano} "$THEMES_PATH/$THEME_NAME.colors"
+      tput civis;;
+    'p')
+      COLOR_PREV=$(( ! $COLOR_PREV ));;
     'v')
       IS_VSCODE=$(( ! $IS_VSCODE ));;
     'w')
@@ -631,22 +685,24 @@ function manageThemes() {
 function interactiveLoop() {
   declare -a INVERTED_PATTERNS=()
 
-  declare -a THEMES=( $(ls $THEMES_PATH | sed 's/.colors//g') )
+  declare -a THEMES=( $(ls $THEMES_PATH | sed 's/\.colors//g') )
   declare -i TOTAL_THEMES=${#THEMES[@]}
 
-  declare -a PATTERNS=( $(ls -p $PATTERNS_PATH | grep -v / | sed 's/.pattern//g') )
+  declare -a PATTERNS=( $(ls -p $PATTERNS_PATH | grep -v / | sed 's/\.pattern//g') )
   declare -i TOTAL_PATTERNS=${#PATTERNS[@]}
 
   declare -i THEME_IDX=0
   declare -i PATTERN_IDX=0
   declare -i FAV_IDX=0
   declare CURRENT_WINDOW="1"
+  declare -i COLOR_PREV=0
 
   tput civis
   echo
   while true; do
     clear
     gthemeLogo
+    showFlagStatus
     case $CURRENT_WINDOW in
       "1")
         showThemesInteractive;;

@@ -10,6 +10,6 @@
   green:      #%green%;
   yellow:     #%yellow%;
   blue:       #%blue%;
-  magenta:	  #%magenta%;
+  magenta:    #%magenta%;
   cyan:       #%cyan%;
 }

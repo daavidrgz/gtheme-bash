@@ -1,10 +1,10 @@
-background: ffffff black
+background: ffffff
 foreground: 282c34
-cursor: 
+cursor: 282c34
 selection-background: 282c34
-selection-foreground: black
+selection-foreground: ffffff
 
-black: NOTE: black 282c34
+black: 282c34
 black-hg: 5c6370
 
 red: e06c75
@@ -22,9 +22,9 @@ blue-hg: 61afef
 magenta: c678dd
 magenta-hg: c678dd
 
-cyan: 
+cyan: 56b6c2
 cyan-hg: 56b6c2
 
-white: 
+white: ffffff
 white-hg: ffffff
 
