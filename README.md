@@ -9,7 +9,7 @@ to a global theme change perception that we all really need.
 
 It also supports:
 * Executing a post script to, for example, restart the dunst notification daemon or refresh the terminal colors with tput.
-* Changing the wallpaper to match your new color scheme (**wallpaper collection included** 😉).
+* Changing the wallpaper to match your new color scheme.
 * Changing the Visual Studio Code theme.
 
 ### Demo
@@ -17,6 +17,17 @@ It also supports:
 ![Demo](screenshots/demo.gif)
 
 ***
+
+## Installation
+
+Just clone the repository and run the installer.
+
+**Be patient when cloning the repo, there are so many top wallpapers included!**
+```
+git clone https://github.com/daavidrgz/gtheme.git gtheme
+cd gtheme
+./install.sh
+```
 
 ## Wiki
 
