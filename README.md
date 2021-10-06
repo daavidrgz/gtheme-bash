@@ -16,8 +16,6 @@ It also supports:
 
 ![Demo](screenshots/demo.gif)
 
-***
-
 ## Installation
 
 Just clone the repository and run the installer.
@@ -28,6 +26,8 @@ git clone https://github.com/daavidrgz/gtheme.git gtheme
 cd gtheme
 ./install.sh
 ```
+
+***
 
 ## Wiki
 
