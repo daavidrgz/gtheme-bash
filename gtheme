@@ -23,12 +23,7 @@ I_B="\e[1;3m" # Italic
 U_B="\e[1;4m" # Underline
 B_B="\e[1;7m" # With background
 
-if [ -z "$XDG_CONFIG_HOME" ]; then
-  echo -e "\n${R}[!]${W} XDG_CONFIG_HOME not set. Please export it in your shell's config file (${W_B}export XDG_CONFIG_HOME=/home/***/.config${W}).\n"
-  exit 1
-fi
-
-GTHEME_PATH=$XDG_CONFIG_HOME/gtheme
+GTHEME_PATH=$HOME/.config/gtheme
 THEMES_PATH=$GTHEME_PATH/themes
 FAV_THEMES_PATH=$THEMES_PATH/fav-themes
 PATTERNS_PATH=$GTHEME_PATH/patterns
@@ -82,7 +77,7 @@ function executePostScript() {
     return
   fi
 
-  $POSTSCRIPTS_PATH/$APP_NAME.sh $2
+  $POSTSCRIPTS_PATH/$APP_NAME.sh $2 &
 }
 
 function setWallpaper() {
@@ -171,8 +166,8 @@ function fillPattern() {
 
 function generateFiles() {
   declare -r THEME_NAME="$1"
-  declare -r INVERTED_PATTERNS="$2"
-  declare PATTERNS="$3"
+  declare PATTERNS="$2"
+  declare -r INVERTED_PATTERNS="$3"
 
   [ -z "$PATTERNS" ] && PATTERNS="$(ls $ACTIVE_PATTERNS_PATH | sed 's/.pattern//g' )"
 
@@ -247,7 +242,7 @@ function flagAsFavourite() {
       rm $FAV_THEMES_PATH/$theme.colors
       echo -e "${G}[-]${W} Theme ${W_B}$theme${W} succesfully removed from favourites!\n"
     else
-      ln -s $THEMES_PATH/$theme.colors $FAV_THEMES_PATH/$theme.colors
+      ln -s ../$theme.colors $FAV_THEMES_PATH/$theme.colors
       echo -e "${G}[+]${W} Theme ${W_B}$theme${W} succesfully added to favourites!\n"
     fi
   done
@@ -501,7 +496,7 @@ function manageFavs() {
       [ $FAV_IDX -lt $(( $TOTAL_FAVS - 10 )) ] && (( FAV_IDX += 10 ));;
     'enter')
       echo -e "\n${B}Applying $FAV_NAME...${W}"
-      generateFiles $FAV_NAME "${INVERTED_PATTERNS[@]}" "" &>/dev/null;;
+      generateFiles "$FAV_NAME" "" "${INVERTED_PATTERNS[@]}" &>/dev/null;;
     'f')
       flagAsFavourite $FAV_NAME
       FAV_THEMES=( $(ls $FAV_THEMES_PATH | sed 's/\.colors//g') )
@@ -655,7 +650,7 @@ function manageThemes() {
       [ $THEME_IDX -lt $(( $TOTAL_THEMES - 10 )) ] && (( THEME_IDX += 10 ));;
     'enter')
       echo -e "\n${B}Applying $THEME_NAME...${W}"
-      generateFiles $THEME_NAME "${INVERTED_PATTERNS[@]}" "" &>/dev/null;;
+      generateFiles "$THEME_NAME" "" "${INVERTED_PATTERNS[@]}" &>/dev/null;;
     'f') 
       flagAsFavourite $THEME_NAME
       FAV_THEMES=( $(ls $FAV_THEMES_PATH | sed 's/\.colors//g') )
@@ -712,7 +707,7 @@ function interactiveLoop() {
         showPatternsInteractive;;
       "3")
         showFavsInteractive;;
-    esac  
+    esac
   done
   tput cnorm
 }
@@ -752,7 +747,7 @@ function main() {
         exit 1;;
     esac
   done
-  
+
   PATTERNS="$(echo $PATTERNS | sed 's/,/ /g')"
   INVERTED_PATTERNS="$(echo $INVERTED_PATTERNS | sed 's/,/ /g')"
   checkPatterns "$PATTERNS $INVERTED_PATTERNS"
@@ -760,7 +755,7 @@ function main() {
   [ -z "$THEME_NAME" ] && interactiveLoop
 
   checkThemes $THEME_NAME
-  generateFiles $THEME_NAME "$INVERTED_PATTERNS" "$PATTERNS"
+  generateFiles "$THEME_NAME" "$PATTERNS" "$INVERTED_PATTERNS"
 }
 
 main "$@"
