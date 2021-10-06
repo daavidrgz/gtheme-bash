@@ -15,35 +15,25 @@ SRC_PATH=$(realpath $(dirname $0))
 GTHEME_PATH=$HOME/.config/gtheme
 
 function gthemeLogo() {
+	echo
   echo -e "${R} ██████╗ ${G} ████████╗${Y} ██╗  ██╗${B} ███████╗${M} ███╗   ███╗${C} ███████╗${W}"
   echo -e "${R}██╔════╝ ${G} ╚══██╔══╝${Y} ██║  ██║${B} ██╔════╝${M} ████╗ ████║${C} ██╔════╝${W}"
   echo -e "${R}██║  ███╗${G}    ██║   ${Y} ███████║${B} █████╗  ${M} ██╔████╔██║${C} █████╗  ${W}"
   echo -e "${R}██║   ██║${G}    ██║   ${Y} ██╔══██║${B} ██╔══╝  ${M} ██║╚██╔╝██║${C} ██╔══╝  ${W}"
   echo -e "${R}╚██████╔╝${G}    ██║   ${Y} ██║  ██║${B} ███████╗${M} ██║ ╚═╝ ██║${C} ███████╗${W}"
   echo -e "${R} ╚═════╝ ${G}    ╚═╝   ${Y} ╚═╝  ╚═╝${B} ╚══════╝${M} ╚═╝     ╚═╝${C} ╚══════╝${W}"
-  echo -e "\n‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒‒\n"
-}
-
-function checkRoot() {
-	if [ ! $UID -eq 0 ]; then
-		echo -e "${R}[!]${W} Must be run as root! Retry with ${W_B}sudo ./install.sh${W}\n"
-		exit 1
-	fi
+	echo -e "\n"
 }
 
 function rollback() {
 	echo -e "\n${Y}•${W} Rolling back the installation...\n"
-	rm /usr/bin/gtheme &>/dev/null
+	[ -e /usr/bin/gtheme ] && sudo rm /usr/bin/gtheme &>/dev/null
 	rm -rf $GTHEME_PATH &>/dev/null
 	exit 1
 }
 
 function copyFiles() {
 	declare -a GTHEME_FOLDERS=("themes" "patterns" "post-scripts" "wallpapers")
-
-	echo -e "${G}•${W} Copying gtheme script to ${W_B}/usr/bin${W}..."
-	cp $SRC_PATH/gtheme /usr/bin
-	echo -e "${G}• Done!${W}\n"
 
 	echo -e "${G}•${W} Creating main gtheme folder in ${W_B}$GTHEME_PATH${W}..."
 	mkdir $GTHEME_PATH &>/dev/null
@@ -58,20 +48,26 @@ function copyFiles() {
 		[ "$FOLDER" == "patterns" ] && mkdir $GTHEME_PATH/$FOLDER/active-patterns
 		[ "$FOLDER" == "themes" ] && mkdir $GTHEME_PATH/$FOLDER/fav-themes
 	done
+	echo -e "${G}• Done!${W}\n"
 
-	echo -e "${G}• Done!${W}\n" 	
+	echo -e "${G}•${W} Copying gtheme script to ${W_B}/usr/bin${W}..."
+	echo -e "${G}•${W} You must be root to proceed"
+	if ! sudo cp $SRC_PATH/gtheme /usr/bin; then
+		echo -e "${R}[!]${W} There was an error while copying script to ${W_B}/usr/bin${W}\n"
+		rollback
+	fi
+	echo -e "${G}• Done!${W}\n"
 }
 
 function main() {
 	echo
 	gthemeLogo
-	checkRoot
 	copyFiles
 	
 	echo -e "${B}• Installation finished!${W}\n"
 	echo -e "${B}•${W} To get more information about its usage refer to the repo: ${B}https://github.com/daavidrgz/gtheme${W}"
 	echo -e "${B}•${W} Feel free to also check my dotfiles: ${B}https://github.com/daavidrgz/dotfiles${W}
-  (Provided patterns and post-scripts were made to perfectly work with them)\n"
+  (Provided patterns and post-scripts were made to perfectly work with them)\n\n"
 
 	exit 0
 }
