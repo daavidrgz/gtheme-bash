@@ -1,8 +1,6 @@
-%output-file%=/home/david/.config/polybar/colors.ini
-
+%output-file%=
 ;; %theme-name%
 
 [color]
-;; background = #%background%
 background = #00000000
 foreground = #%background%

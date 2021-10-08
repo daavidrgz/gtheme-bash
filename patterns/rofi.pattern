@@ -1,12 +1,11 @@
-%output-file%=/home/david/.config/rofi/colors.rasi
-
+%output-file%=
 // %theme-name%
 
 * {
   bg:         #%background%;
   fg:         #%foreground%;
   se:         #%selection-background%;
-  red:	      #%red%;
+  red:        #%red%;
   green:      #%green%;
   yellow:     #%yellow%;
   blue:       #%blue%;

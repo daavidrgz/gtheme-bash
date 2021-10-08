@@ -1,6 +1,6 @@
 #!/bin/sh
 
-WALLPAPER_URL=~/.config/gtheme/wallpapers/Rose-Pine/Ashim.jpg
+WALLPAPER_URL=~/.config/gtheme/wallpapers/Horizon/sunset.jpg
 feh --no-fehbg --bg-fill "$WALLPAPER_URL"
 
 # Flag to not execute the dm wallpaper update after every boot

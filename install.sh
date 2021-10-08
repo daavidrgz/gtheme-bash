@@ -26,29 +26,34 @@ function gthemeLogo() {
 }
 
 function rollback() {
-	echo -e "\n${Y}•${W} Rolling back the installation...\n"
-	[ -e /usr/bin/gtheme ] && sudo rm /usr/bin/gtheme &>/dev/null
-	rm -rf $GTHEME_PATH &>/dev/null
+	# echo -e "\n${Y}•${W} Rolling back the installation...\n"
+	# [ -e /usr/bin/gtheme ] && sudo rm /usr/bin/gtheme &>/dev/null
+	# rm -rf $GTHEME_PATH &>/dev/null
 	exit 1
 }
 
 function copyFiles() {
 	declare -a GTHEME_FOLDERS=("themes" "patterns" "post-scripts" "wallpapers")
 
-	echo -e "${G}•${W} Creating main gtheme folder in ${W_B}$GTHEME_PATH${W}..."
-	mkdir $GTHEME_PATH &>/dev/null
+	if [ ! -e "$GTHEME_PATH" ]; then
+		echo -e "${G}•${W} Creating main gtheme folder in ${W_B}$GTHEME_PATH${W}..."
+		mkdir $GTHEME_PATH &>/dev/null
 
-	for FOLDER in ${GTHEME_FOLDERS[@]}; do
-		echo -e "${G}•${W} Transfering ${W_B}$FOLDER${W}..."
-		if ! cp -r $SRC_PATH/$FOLDER/ $GTHEME_PATH/$FOLDER; then
-			echo -e "${R}[!]${W} There was an error while transfering ${W_B}$SRC_PATH/$FOLDER/${W}!\n"
-			rollback
-		fi
+		for FOLDER in ${GTHEME_FOLDERS[@]}; do
+			echo -e "${G}•${W} Transfering ${W_B}$FOLDER${W}..."
+			if ! cp -r $SRC_PATH/$FOLDER/ $GTHEME_PATH/$FOLDER; then
+				echo -e "${R}[!]${W} There was an error while transfering ${W_B}$SRC_PATH/$FOLDER/${W}!\n"
+				rollback
+			fi
 
-		[ "$FOLDER" == "patterns" ] && mkdir $GTHEME_PATH/$FOLDER/active-patterns
-		[ "$FOLDER" == "themes" ] && mkdir $GTHEME_PATH/$FOLDER/fav-themes
-	done
-	echo -e "${G}• Done!${W}\n"
+			[ "$FOLDER" == "patterns" ] && mkdir $GTHEME_PATH/$FOLDER/active-patterns
+			[ "$FOLDER" == "themes" ] && mkdir $GTHEME_PATH/$FOLDER/fav-themes
+		done
+		echo -e "${G}• Done!${W}\n"
+
+	else
+		echo -e "${Y}•${W} It looks like you have already installed gtheme. Skipping the main gtheme folder copy...\n"
+	fi
 
 	echo -e "${G}•${W} Copying gtheme script to ${W_B}/usr/bin${W}..."
 	echo -e "${G}•${W} You must be root to proceed"

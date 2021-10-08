@@ -77,7 +77,7 @@ function executePostScript() {
     return
   fi
 
-  $POSTSCRIPTS_PATH/$APP_NAME.sh $2 &
+  $POSTSCRIPTS_PATH/$APP_NAME.sh $2 &>/dev/null &
 }
 
 function setWallpaper() {
@@ -121,13 +121,13 @@ function fillPattern() {
   declare DEST="$(/bin/cat $PATTERN | grep -e ".*%output-file%.*" | awk -F '=' '{print $2}')"
 
   if [ -z "$DEST" ]; then
-    echo -e "${R}[!]${W} No output file found. Using the default path."
-    DEST=$HOME/.config/$1/gtheme-colors
+    echo -e "${R}[!]${W} No output file found! Please, modify the pattern in ${W_B}$PATTERNS_PATH${W}\n"
+    return 1
   fi
 
   if [ ! -e "$(dirname $DEST)" ]; then
     echo -e "${R}[!]${W} The folder ${W_B}$(dirname $DEST)${W} does not exist!\n"
-    return
+    return 1
   fi
 
   cp $PATTERN $DEST
@@ -152,8 +152,8 @@ function fillPattern() {
     sed -i "s|%$attr%|$VALUE|g" $DEST
   done
 
-  sed -i "s|%theme-name%| -------- Theme: $2 --------|" $DEST
-  sed -i "s|.*%output-file%.*||" $DEST
+  sed -i "s|%theme-name%| -------- Gtheme: $2 --------|" $DEST
+  sed -i "/.*%output-file%.*/d" $DEST
 
   echo -e "${B}•${W} Created file ${W_B}$(basename $DEST)${W} in ${W_B}$(dirname $DEST)${W}"
 
@@ -162,6 +162,7 @@ function fillPattern() {
   echo -e "${B}•${W} Theme applied to ${G}$1${W}\n"
 
   echo -e "─────────────────────\n"
+  return 0
 }
 
 function generateFiles() {
@@ -176,12 +177,16 @@ function generateFiles() {
     echo "$INVERTED_PATTERNS" | grep $PATTERN &>/dev/null
     fillPattern $PATTERN $THEME_NAME $?
 
+    [ $? -ne 0 ] && return 1
+
     sed -i "/$PATTERN:.*/d" $CURRENT_THEME_FILE
     echo -e "$PATTERN: $THEME_NAME" >> $CURRENT_THEME_FILE
   done
 
   [ $IS_VSCODE -eq 0 ] && setVscodeTheme $THEME_NAME
   [ $IS_WALLPAPER -eq 0 ] && setWallpaper $THEME_NAME
+
+  return 0
 }
 
 function showPatterns() {
@@ -401,6 +406,23 @@ function showCommonHelp() {
   return 0
 }
 
+function applyTheme() {
+  clear
+  gthemeLogo
+  echo -e "\n${B}Applying $1...${W}\n"
+  generateFiles "$1" "" "${INVERTED_PATTERNS[@]}"
+  
+  [ $? -eq 0 ] && return
+
+  echo -e "\n${R}[${W} Press any key to continue ${R}]${W}\n"
+  keyInput &>/dev/null
+}
+
+function editFile() {
+  ${VISUAL:-nano} $1
+  tput civis
+}
+
 function showFlagStatus() {
   echo -e "${C}╭─── OPTIONS ─────╮"
   echo -e "${C}│                 │"
@@ -495,16 +517,14 @@ function manageFavs() {
     'right') 
       [ $FAV_IDX -lt $(( $TOTAL_FAVS - 10 )) ] && (( FAV_IDX += 10 ));;
     'enter')
-      echo -e "\n${B}Applying $FAV_NAME...${W}"
-      generateFiles "$FAV_NAME" "" "${INVERTED_PATTERNS[@]}" &>/dev/null;;
+      applyTheme $FAV_NAME;;
     'f')
       flagAsFavourite $FAV_NAME
       FAV_THEMES=( $(ls $FAV_THEMES_PATH | sed 's/\.colors//g') )
       TOTAL_FAVS=${#FAV_THEMES[@]}
       [ $FAV_IDX -ge $TOTAL_FAVS ] && (( FAV_IDX = $TOTAL_FAVS - 1 ));;
     'e')
-      ${VISUAL:-nano} "$THEMES_PATH/$FAV_NAME.colors"
-      tput civis;;
+      editFile "$THEMES_PATH/$FAV_NAME.colors";;
     'p')
       COLOR_PREV=$(( ! $COLOR_PREV ));;
     'v')
@@ -579,16 +599,15 @@ function managePatterns() {
         addPatterns $PATTERN_NAME &>/dev/null
       fi;;
     'i')
-      if [[ " ${INVERTED_PATTERNS[*]} " =~ " $PATTERN_NAME " ]]; then
-        for i in ${!INVERTED_PATTERNS[@]}; do
-          [ "${INVERTED_PATTERNS[i]}" == "$PATTERN_NAME" ] && unset INVERTED_PATTERNS[i]
-        done
-      else
-        INVERTED_PATTERNS+=( "$PATTERN_NAME" )
-      fi;;
+      for i in ${!INVERTED_PATTERNS[@]}; do
+        if [ "${INVERTED_PATTERNS[i]}" == "$PATTERN_NAME" ]; then
+          unset INVERTED_PATTERNS[i]
+          return
+        fi
+      done
+      INVERTED_PATTERNS+=( "$PATTERN_NAME" );;
     'e')
-      ${VISUAL:-nano} "$PATTERNS_PATH/$PATTERN_NAME.pattern"
-      tput civis;;
+      editFile "$PATTERNS_PATH/$PATTERN_NAME.pattern";;
     'p')
       COLOR_PREV=$(( ! $COLOR_PREV ));;
     'v')
@@ -649,16 +668,14 @@ function manageThemes() {
     'right') 
       [ $THEME_IDX -lt $(( $TOTAL_THEMES - 10 )) ] && (( THEME_IDX += 10 ));;
     'enter')
-      echo -e "\n${B}Applying $THEME_NAME...${W}"
-      generateFiles "$THEME_NAME" "" "${INVERTED_PATTERNS[@]}" &>/dev/null;;
+      applyTheme $THEME_NAME;;
     'f') 
       flagAsFavourite $THEME_NAME
       FAV_THEMES=( $(ls $FAV_THEMES_PATH | sed 's/\.colors//g') )
       TOTAL_FAVS=${#FAV_THEMES[@]}
       sleep 1;;
     'e')
-      ${VISUAL:-nano} "$THEMES_PATH/$THEME_NAME.colors"
-      tput civis;;
+      editFile "$THEMES_PATH/$THEME_NAME.colors";;
     'p')
       COLOR_PREV=$(( ! $COLOR_PREV ));;
     'v')

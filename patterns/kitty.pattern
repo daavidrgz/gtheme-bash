@@ -1,5 +1,4 @@
-%output-file%=/home/david/.config/kitty/colors.conf
-
+%output-file%=
 # %theme-name%
 
 foreground               #%foreground%
