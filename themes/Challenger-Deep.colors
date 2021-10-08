@@ -1,6 +1,8 @@
+vscode: Challenger Deep
+
 background: 1e1c31
 foreground: cbe3e7
-cursor: 
+cursor: cbe3e7 
 selection-background: fbfcfc
 selection-foreground: 1e1c31 
 

@@ -3,7 +3,7 @@ wallpaper: ~/.config/gtheme/wallpapers/Iceberg/snow-mountain.jpg
 
 background: e8e9ec
 foreground: 33374c
-cursor: 
+cursor: 33374c
 selection-background: 33374c
 selection-foreground: e8e9ec 
 

@@ -3,7 +3,7 @@ wallpapers: ~/.config/gtheme/wallpapers/Everforest/road.jpg
 
 background: f8f0dc
 foreground: 5c6a72
-cursor: 
+cursor: 5c6a72
 selection-background: 5c6a72
 selection-foreground: f8f0dc 
 
