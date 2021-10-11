@@ -23,6 +23,9 @@ I_B="\e[1;3m" # Italic
 U_B="\e[1;4m" # Underline
 B_B="\e[1;7m" # With background
 
+ATTR_NAMES=("background" "foreground" "cursor" "selection-background" "selection-foreground" \
+"black" "black-hg" "red" "red-hg" "green" "green-hg" "yellow" "yellow-hg" "blue" "blue-hg" "magenta" "magenta-hg" "cyan" "cyan-hg" "white" "white-hg")
+
 GTHEME_PATH=$HOME/.config/gtheme
 THEMES_PATH=$GTHEME_PATH/themes
 FAV_THEMES_PATH=$THEMES_PATH/fav-themes
@@ -38,8 +41,6 @@ fi
 
 # •• Global Settings
 VSCODE_SETTINGS_FILE="$HOME/.config/Code/User/settings.json"
-ATTR_NAMES=("background" "foreground" "cursor" "selection-background" "selection-foreground" \
-"black" "black-hg" "red" "red-hg" "green" "green-hg" "yellow" "yellow-hg" "blue" "blue-hg" "magenta" "magenta-hg" "cyan" "cyan-hg" "white" "white-hg")
 
 trap ctrl_c INT
 function ctrl_c() {
@@ -66,19 +67,6 @@ function helpPanel() {
   ${G}-h${W}                        show this panel.\n"
 }
 
-function executePostScript() {
-  declare -r APP_NAME=$1
-
-  echo -e "${B}•${W} Executing post-script..."
-
-  if [ ! -e $POSTSCRIPTS_PATH/$APP_NAME.sh ]; then
-    echo -e "${Y}•${W} No post-script found!"
-    return
-  fi
-
-  $POSTSCRIPTS_PATH/$APP_NAME.sh $2 &>/dev/null &
-}
-
 function setWallpaper() {
   WALLPAPER_SCRIPT=$POSTSCRIPTS_PATH/wallpaper.sh
 
@@ -92,7 +80,7 @@ function setWallpaper() {
 
   sed -i "s|.*WALLPAPER_URL=.*|WALLPAPER_URL=$WALLPAPER|" $WALLPAPER_SCRIPT
   if [ ! -x $WALLPAPER_SCRIPT ]; then
-    echo -e "\n${Y}[!]${W} $WALLPAPER_SCRIPT is not executable. Run chmod +x $WALLPAPER_SCRIPT to solve it"
+    echo -e "${R}•${W} $WALLPAPER_SCRIPT is not executable. Run chmod +x $WALLPAPER_SCRIPT to solve it!\n"
     return 1
   fi
 
@@ -109,7 +97,7 @@ function setWallpaper() {
 
 function setVscodeTheme() {
   if [ ! -e $VSCODE_SETTINGS_FILE ]; then
-    echo -e "${R}[!]${W} The vscode settings file ${W_B}$VSCODE_SETTINGS_FILE${W} does not exist!"
+    echo -e "${R}[!]${W} The vscode settings file ${W_B}$VSCODE_SETTINGS_FILE${W} does not exist\n"
     return 1
   fi
 
@@ -121,6 +109,24 @@ function setVscodeTheme() {
 
   sed -i "/.*vscode.*/d" $CURRENT_THEME_FILE
   echo -e "vscode: $VSCODETHEME" >> $CURRENT_THEME_FILE
+}
+
+function executePostScript() {
+  declare -r POST_SCRIPT=$POSTSCRIPTS_PATH/$1.sh
+
+  echo -e "${B}•${W} Executing post-script..."
+
+  if [ ! -e $POST_SCRIPT ]; then
+    echo -e "${Y}•${W} No post-script found!"
+    return 0
+  fi
+
+  if [ ! -x $POST_SCRIPT ]; then
+    echo -e "${R}•${W} $POST_SCRIPT is not executable. Run chmod +x $POST_SCRIPT to solve it!\n"
+    return 1
+  fi
+
+  $POST_SCRIPT $2 &>/dev/null &
 }
 
 function fillPattern() {
@@ -204,31 +210,28 @@ function generateFiles() {
 }
 
 function showPatterns() {
-  declare -a PATTERNS=($@)
-
   echo
-  for pattern in "${PATTERNS[@]}"; do
-    if [ -e $ACTIVE_PATTERNS_PATH/$pattern ]; then
-      printf "${B}•${W} %-20s ${B}Active${W}\n" "${pattern::-8}"
+  for pattern in $(ls -p $PATTERNS_PATH | grep -v / | sed 's/\.pattern//g'); do
+    if [ -e $ACTIVE_PATTERNS_PATH/$pattern.pattern ]; then
+      printf "${B}•${W} %-20s ${B}Active${W}\n" "$pattern"
     else
-      printf "${Y}•${W} %-20s ${Y}Not active${W}\n" "${pattern::-8}"
+      printf "${Y}•${W} %-20s ${Y}Not active${W}\n" "$pattern"
     fi
   done
   echo
 }
 function showAllThemes() {
   declare -i COUNT=0
-  declare -a COLOR_SCHEMES=($@)
 
   echo
-  for theme in "${COLOR_SCHEMES[@]}"; do
+  for theme in $(ls -p $THEMES_PATH | grep -v / | sed 's/\.colors//g'); do
     declare FAV_COLOR=${W}
-    [ -e $FAV_THEMES_PATH/$theme ] && FAV_COLOR=${Y}
+    [ -e $FAV_THEMES_PATH/$theme.colors ] && FAV_COLOR=${Y}
 
-    if /bin/cat $CURRENT_THEME_FILE | grep -e ": ${theme::-7}$" &>/dev/null; then
-      printf "${B}%7s${W} ${FAV_COLOR}%s ${B}(active)${W}\n" "[$COUNT]" "• ${theme::-7}"
+    if /bin/cat $CURRENT_THEME_FILE | grep -e ": $theme$" &>/dev/null; then
+      printf "${B}%7s${W} ${FAV_COLOR}%s ${B}(active)${W}\n" "[$COUNT]" "• $theme"
     else
-      printf "${G}%7s${W} ${FAV_COLOR}%s${W}\n" "[$COUNT]" "• ${theme::-7}"
+      printf "${G}%7s${W} ${FAV_COLOR}%s${W}\n" "[$COUNT]" "• $theme"
     fi
     COUNT=$COUNT+1
   done
@@ -244,8 +247,8 @@ function showFavThemes() {
 
 function list() {
   case "$1" in
-    "themes") showAllThemes "$(ls -p $THEMES_PATH | grep -v /)";;
-    "patterns") showPatterns "$(ls -p $PATTERNS_PATH | grep -v /)";;
+    "themes") showAllThemes;;
+    "patterns") showPatterns;;
     "favs") showFavThemes;;
     *) echo -e "\n${R}[!]${W} Invalid option ${W_B}$1${W}!\n"; exit 1;;
   esac
@@ -365,7 +368,7 @@ function keyInput() {
     1) echo "1";;
     2) echo "2";;
     3) echo "3";;
-    *) echo invalid
+    *) echo "invalid"
   esac
 }
 
@@ -536,7 +539,7 @@ function manageFavs() {
       flagAsFavourite $FAV_NAME
       FAV_THEMES=( $(ls $FAV_THEMES_PATH | sed 's/\.colors//g') )
       TOTAL_FAVS=${#FAV_THEMES[@]}
-      [ $FAV_IDX -ge $TOTAL_FAVS ] && (( FAV_IDX = $TOTAL_FAVS - 1 ));;
+      [ $FAV_IDX -eq $TOTAL_FAVS ] && (( FAV_IDX = $TOTAL_FAVS - 1 ));;
     e)
       editFile "$THEMES_PATH/$FAV_NAME.colors";;
     c)
@@ -551,8 +554,6 @@ function manageFavs() {
       showThemesHelp;;
     1|2|3)
       CURRENT_WINDOW="$INPUT";;
-    *)
-      ;;
   esac
 }
 
@@ -635,8 +636,6 @@ function managePatterns() {
       ctrl_c;;
     1|2|3)
       CURRENT_WINDOW="$INPUT";;
-    *)
-      ;;
   esac
 }
 
@@ -702,8 +701,6 @@ function manageThemes() {
       showThemesHelp;;
     1|2|3)
       CURRENT_WINDOW="$INPUT";;
-    *)
-      ;;
   esac
 }
 
