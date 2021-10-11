@@ -38,7 +38,6 @@ fi
 
 # •• Global Settings
 VSCODE_SETTINGS_FILE="$HOME/.config/Code/User/settings.json"
-SET_WALLPAPER_SCRIPT="$POSTSCRIPTS_PATH/wallpaper.sh"
 ATTR_NAMES=("background" "foreground" "cursor" "selection-background" "selection-foreground" \
 "black" "black-hg" "red" "red-hg" "green" "green-hg" "yellow" "yellow-hg" "blue" "blue-hg" "magenta" "magenta-hg" "cyan" "cyan-hg" "white" "white-hg")
 
@@ -81,27 +80,39 @@ function executePostScript() {
 }
 
 function setWallpaper() {
-  declare -r WALLPAPER=$(/bin/cat $THEMES_PATH/$1.colors | grep wallpaper | awk -F ': ' '{print $2}')
+  WALLPAPER_SCRIPT=$POSTSCRIPTS_PATH/wallpaper.sh
 
-  [ -z "$WALLPAPER" ] && return
-
-  sed -i "s|.*WALLPAPER_URL=.*|WALLPAPER_URL=$WALLPAPER|" $SET_WALLPAPER_SCRIPT
-  if [ ! -x $SET_WALLPAPER_SCRIPT ]; then
-    echo -e "\n${Y}[!]${W} $SET_WALLPAPER_SCRIPT is not executable. Run chmod +x $SET_WALLPAPER_SCRIPT to solve it"
-    return
+  if [ ! -e $WALLPAPER_SCRIPT ]; then
+    echo -e "${R}[!]${W} The wallpaper script does not exist! Create a ${W_B}wallpaper.sh${W} under ${W_B}$POSTSCRIPTS_PATH${W}"
+    return 1
   fi
 
-  if $SET_WALLPAPER_SCRIPT; then
+  declare -r WALLPAPER=$(/bin/cat $THEMES_PATH/$1.colors | grep wallpaper | awk -F ': ' '{print $2}')
+  [ -z "$WALLPAPER" ] && return 0
+
+  sed -i "s|.*WALLPAPER_URL=.*|WALLPAPER_URL=$WALLPAPER|" $WALLPAPER_SCRIPT
+  if [ ! -x $WALLPAPER_SCRIPT ]; then
+    echo -e "\n${Y}[!]${W} $WALLPAPER_SCRIPT is not executable. Run chmod +x $WALLPAPER_SCRIPT to solve it"
+    return 1
+  fi
+
+  if $WALLPAPER_SCRIPT; then
     echo -e "${B}[+]${W} Wallpaper ${W_B}$(basename $WALLPAPER)${W} applied!\n"
 
     sed -i "/.*wallpaper.*/d" $CURRENT_THEME_FILE
     echo -e "wallpaper: $WALLPAPER" >> $CURRENT_THEME_FILE
   else
     echo -e "${R}[!]${W} There was an error while setting the wallpaper.\n"
+    return 1
   fi
 }
 
 function setVscodeTheme() {
+  if [ ! -e $VSCODE_SETTINGS_FILE ]; then
+    echo -e "${R}[!]${W} The vscode settings file ${W_B}$VSCODE_SETTINGS_FILE${W} does not exist!"
+    return 1
+  fi
+
   declare -r VSCODETHEME=$(/bin/cat $THEMES_PATH/$1.colors | grep vscode | awk -F ': ' '{print $2}')
   [ -z "$VSCODETHEME" ] && return
 
@@ -182,8 +193,12 @@ function generateFiles() {
     echo -e "$PATTERN: $THEME_NAME" >> $CURRENT_THEME_FILE
   done
 
-  [ $IS_VSCODE -eq 0 ] && setVscodeTheme $THEME_NAME
-  [ $IS_WALLPAPER -eq 0 ] && setWallpaper $THEME_NAME
+  if [ $IS_VSCODE -eq 0 ]; then
+    setVscodeTheme $THEME_NAME || return 1
+  fi
+  if [ $IS_WALLPAPER -eq 0 ]; then
+    setWallpaper $THEME_NAME || return 1
+  fi
 
   return 0
 }
