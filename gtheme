@@ -365,7 +365,7 @@ function showPatternsHelp() {
     echo -e "${Y}│  ${B}'up'${W}     previous pattern                ${Y}│"
     echo -e "${Y}│  ${B}'down'${W}   next pattern                    ${Y}│"
     echo -e "${Y}│  ${B}'i'${W}      toggle invert pattern           ${Y}│"
-    echo -e "${Y}│  ${B}'c'${W}      edit pattern's post-script      ${Y}│"
+    echo -e "${Y}│  ${B}'p'${W}      edit pattern's post-script      ${Y}│"
 
     showCommonHelp || break
   done
@@ -391,7 +391,7 @@ function showThemesHelp() {
 
 function showCommonHelp() {
   echo -e "${Y}│  ${B}'e'${W}      edit file in \$VISUAL env var    ${Y}│"
-  echo -e "${Y}│  ${B}'p'${W}      toggle colors preview           ${Y}│"
+  echo -e "${Y}│  ${B}'c'${W}      toggle colors preview           ${Y}│"
   echo -e "${Y}│  ${B}'w'${W}      toggle apply wallpaper          ${Y}│"
   echo -e "${Y}│  ${B}'v'${W}      toggle apply vscode theme       ${Y}│"
   echo -e "${Y}│  ${B}'q'${W}      quit                            ${Y}│"
@@ -524,7 +524,7 @@ function manageFavs() {
       [ $FAV_IDX -ge $TOTAL_FAVS ] && (( FAV_IDX = $TOTAL_FAVS - 1 ));;
     e)
       editFile "$THEMES_PATH/$FAV_NAME.colors";;
-    p)
+    c)
       COLOR_PREV=$(( ! $COLOR_PREV ));;
     v)
       IS_VSCODE=$(( ! $IS_VSCODE ));;
@@ -604,11 +604,11 @@ function managePatterns() {
         fi
       done
       INVERTED_PATTERNS+=( "$PATTERN_NAME" );;
-    c)
+    p)
       editFile "$POSTSCRIPTS_PATH/$PATTERN_NAME.sh";;
     e)
       editFile "$PATTERNS_PATH/$PATTERN_NAME.pattern";;
-    p)
+    c)
       COLOR_PREV=$(( ! $COLOR_PREV ));;
     v)
       IS_VSCODE=$(( ! $IS_VSCODE ));;
@@ -675,7 +675,7 @@ function manageThemes() {
       sleep 1;;
     e)
       editFile "$THEMES_PATH/$THEME_NAME.colors";;
-    p)
+    c)
       COLOR_PREV=$(( ! $COLOR_PREV ));;
     v)
       IS_VSCODE=$(( ! $IS_VSCODE ));;
