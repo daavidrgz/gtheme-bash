@@ -1,13 +1,19 @@
 #!/bin/sh
 
-WALLPAPER_URL=~/.config/gtheme/wallpapers/Horizon/sunset.jpg
+Y="\e[1;33m"
+W="\e[0m"
+W_B="\e[1m"
+
+WALLPAPER_URL=~/.config/gtheme/wallpapers/Gruvbox/light-archlinux.png
 feh --no-fehbg --bg-fill "$WALLPAPER_URL"
 
 # Flag to not execute the dm wallpaper update after every boot
 [ "$1" == "no-dm" ] && exit 0
 
+echo -e "${Y}•${W} Root privileges are needed in order to apply the wallpaper to lightdm webkit theme aether!\n"
 LIGHTDM_WALLPAPER=/usr/share/lightdm-webkit/themes/lightdm-webkit-theme-aether/src/img/wallpapers/wallpaper
 sudo rm $LIGHTDM_WALLPAPER
 sudo cp $WALLPAPER_URL $LIGHTDM_WALLPAPER
+echo -e "Created wallpaper file in ${W_B}$LIGHTDM_WALLPAPER!${W}"
 
 exit 0

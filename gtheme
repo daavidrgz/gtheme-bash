@@ -32,12 +32,12 @@ POSTSCRIPTS_PATH=$GTHEME_PATH/post-scripts
 CURRENT_THEME_FILE=$GTHEME_PATH/current-theme
 
 if [ ! -e $GTHEME_PATH ]; then
-  echo -e "\n${R}[!]${W} Gtheme folder not found! Ensure that ${W_B}$XDG_CONFIG_HOME/gtheme${W} folder exists.\n"
+  echo -e "\n${R}[!]${W} Gtheme folder not found! Ensure that ${W_B}$HOME/.config/gtheme${W} folder exists.\n"
   exit 1
 fi
 
 # •• Global Settings
-VSCODE_SETTINGS_FILE="$XDG_CONFIG_HOME/Code/User/settings.json"
+VSCODE_SETTINGS_FILE="$HOME/.config/Code/User/settings.json"
 SET_WALLPAPER_SCRIPT="$POSTSCRIPTS_PATH/wallpaper.sh"
 ATTR_NAMES=("background" "foreground" "cursor" "selection-background" "selection-foreground" \
 "black" "black-hg" "red" "red-hg" "green" "green-hg" "yellow" "yellow-hg" "blue" "blue-hg" "magenta" "magenta-hg" "cyan" "cyan-hg" "white" "white-hg")
@@ -175,9 +175,8 @@ function generateFiles() {
   echo
   for PATTERN in $PATTERNS; do
     echo "$INVERTED_PATTERNS" | grep $PATTERN &>/dev/null
-    fillPattern $PATTERN $THEME_NAME $?
 
-    [ $? -ne 0 ] && return 1
+    fillPattern $PATTERN $THEME_NAME $? || return 1
 
     sed -i "/$PATTERN:.*/d" $CURRENT_THEME_FILE
     echo -e "$PATTERN: $THEME_NAME" >> $CURRENT_THEME_FILE
@@ -334,22 +333,23 @@ function keyInput() {
   fi
 
   case $mode in
-    '[A') echo "up";;
-    '[B') echo "down";;
-    '[D') echo "left";;
-    '[C') echo "right";;
+    [A) echo "up";;
+    [B) echo "down";;
+    [D) echo "left";;
+    [C) echo "right";;
     '') echo "enter";;
-    'f') echo "f";;
-    'e') echo "e";;
-    'p') echo "p";;
-    'i') echo "i";;
-    'q') echo "q";;
-    'h') echo "h";;
-    'v') echo "v";;
-    'w') echo "w";;
-    '1') echo "1";;
-    '2') echo "2";;
-    '3') echo "3";;
+    f) echo "f";;
+    e) echo "e";;
+    p) echo "p";;
+    c) echo "c";;
+    i) echo "i";;
+    q) echo "q";;
+    h) echo "h";;
+    v) echo "v";;
+    w) echo "w";;
+    1) echo "1";;
+    2) echo "2";;
+    3) echo "3";;
     *) echo invalid
   esac
 }
@@ -365,9 +365,9 @@ function showPatternsHelp() {
     echo -e "${Y}│  ${B}'up'${W}     previous pattern                ${Y}│"
     echo -e "${Y}│  ${B}'down'${W}   next pattern                    ${Y}│"
     echo -e "${Y}│  ${B}'i'${W}      toggle invert pattern           ${Y}│"
+    echo -e "${Y}│  ${B}'c'${W}      edit pattern's post-script      ${Y}│"
 
-    showCommonHelp
-    [ $? -eq 1 ] && break
+    showCommonHelp || break
   done
 }
 
@@ -385,8 +385,7 @@ function showThemesHelp() {
     echo -e "${Y}│  ${B}'right'${W}  10 next themes                  ${Y}│" 
     echo -e "${Y}│  ${B}'f'${W}      flag/unflag as favourite        ${Y}│"
 
-    showCommonHelp
-    [ $? -eq 1 ] && break
+    showCommonHelp || break
   done
 }
 
@@ -403,16 +402,14 @@ function showCommonHelp() {
   INPUT=$(keyInput)
   [ "$INPUT" == "h" ] && return 1
   [ "$INPUT" == "q" ] && ctrl_c
-  return 0
 }
 
 function applyTheme() {
   clear
   gthemeLogo
   echo -e "\n${B}Applying $1...${W}\n"
-  generateFiles "$1" "" "${INVERTED_PATTERNS[@]}"
   
-  [ $? -eq 0 ] && return
+  generateFiles "$1" "" "${INVERTED_PATTERNS[@]}" && return
 
   echo -e "\n${R}[${W} Press any key to continue ${R}]${W}\n"
   keyInput &>/dev/null
@@ -433,18 +430,21 @@ function showFlagStatus() {
   else
     printf "${R}%-7s${W} ${C}│\n" "• OFF"
   fi
+
   echo -en "${C}│${W} VSCode    "
   if [ $IS_VSCODE -eq 0 ]; then
     printf "${G}%-7s${W} ${C}│\n" "• ON"
   else
     printf "${R}%-7s${W} ${C}│\n" "• OFF"
   fi
+
   echo -en "${C}│${W} Preview   "
   if [ $COLOR_PREV -eq 0 ]; then
     printf "${G}%-7s${W} ${C}│\n" "• ON"
   else
     printf "${R}%-7s${W} ${C}│\n" "• OFF"
   fi
+
   echo -e "${C}╰─────────────────╯${W}\n"
 }
 
@@ -473,7 +473,6 @@ function showColorPreview() {
 }
 
 function showFavsInteractive() {
-  declare -i NUM_ELEMS=20
   declare -i SHOWN_ELEMS=0
 
   declare -i c=$(( $FAV_IDX - $NUM_ELEMS/2 - 1 ))
@@ -508,34 +507,34 @@ function manageFavs() {
   FAV_NAME=${FAV_THEMES[$FAV_IDX]}
   INPUT=$(keyInput)
   case $INPUT in
-    'up')
+    up)
       [ $FAV_IDX -gt 0 ] && (( FAV_IDX -= 1 ));;
-    'down')
+    down)
       [ $FAV_IDX -lt $(( $TOTAL_FAVS - 1 )) ] && (( FAV_IDX += 1 ));;
-    'left')
+    left)
       [ $FAV_IDX -ge 10 ] && (( FAV_IDX -= 10 ));;
-    'right') 
+    right) 
       [ $FAV_IDX -lt $(( $TOTAL_FAVS - 10 )) ] && (( FAV_IDX += 10 ));;
-    'enter')
+    enter)
       applyTheme $FAV_NAME;;
-    'f')
+    f)
       flagAsFavourite $FAV_NAME
       FAV_THEMES=( $(ls $FAV_THEMES_PATH | sed 's/\.colors//g') )
       TOTAL_FAVS=${#FAV_THEMES[@]}
       [ $FAV_IDX -ge $TOTAL_FAVS ] && (( FAV_IDX = $TOTAL_FAVS - 1 ));;
-    'e')
+    e)
       editFile "$THEMES_PATH/$FAV_NAME.colors";;
-    'p')
+    p)
       COLOR_PREV=$(( ! $COLOR_PREV ));;
-    'v')
+    v)
       IS_VSCODE=$(( ! $IS_VSCODE ));;
-    'w')
+    w)
       IS_WALLPAPER=$(( ! $IS_WALLPAPER ));;
-    'q')
+    q)
       ctrl_c;;
-    'h')
+    h)
       showThemesHelp;;
-    '1'|'2'|'3')
+    1|2|3)
       CURRENT_WINDOW="$INPUT";;
     *)
       ;;
@@ -543,7 +542,6 @@ function manageFavs() {
 }
 
 function showPatternsInteractive() {
-  declare -i NUM_ELEMS=20
   declare -i SHOWN_ELEMS=0
 
   declare -i c=$(( $PATTERN_IDX - $NUM_ELEMS/2 - 1 ))
@@ -588,17 +586,17 @@ function managePatterns() {
   PATTERN_NAME=${PATTERNS[$PATTERN_IDX]}
   INPUT=$(keyInput)
   case $INPUT in
-    'up')
+    up)
       [ $PATTERN_IDX -gt 0 ] && (( PATTERN_IDX -= 1 ));;
-    'down')
+    down)
       [ $PATTERN_IDX -lt $(( $TOTAL_PATTERNS - 1 )) ] && (( PATTERN_IDX += 1 ));;
-    'enter')
+    enter)
       if [ -e $ACTIVE_PATTERNS_PATH/$PATTERN_NAME.pattern ]; then
         removePatterns $PATTERN_NAME &>/dev/null
       else
         addPatterns $PATTERN_NAME &>/dev/null
       fi;;
-    'i')
+    i)
       for i in ${!INVERTED_PATTERNS[@]}; do
         if [ "${INVERTED_PATTERNS[i]}" == "$PATTERN_NAME" ]; then
           unset INVERTED_PATTERNS[i]
@@ -606,19 +604,21 @@ function managePatterns() {
         fi
       done
       INVERTED_PATTERNS+=( "$PATTERN_NAME" );;
-    'e')
+    c)
+      editFile "$POSTSCRIPTS_PATH/$PATTERN_NAME.sh";;
+    e)
       editFile "$PATTERNS_PATH/$PATTERN_NAME.pattern";;
-    'p')
+    p)
       COLOR_PREV=$(( ! $COLOR_PREV ));;
-    'v')
+    v)
       IS_VSCODE=$(( ! $IS_VSCODE ));;
-    'w')
+    w)
       IS_WALLPAPER=$(( ! $IS_WALLPAPER ));;
-    'h')
+    h)
       showPatternsHelp;;
-    'q')
+    q)
       ctrl_c;;
-    '1'|'2'|'3')
+    1|2|3)
       CURRENT_WINDOW="$INPUT";;
     *)
       ;;
@@ -626,7 +626,6 @@ function managePatterns() {
 }
 
 function showThemesInteractive() {
-  declare -i NUM_ELEMS=20
   declare -i SHOWN_ELEMS=0
 
   declare -i c=$(( $THEME_IDX - $NUM_ELEMS/2 - 1 ))
@@ -659,34 +658,34 @@ function manageThemes() {
   THEME_NAME=${THEMES[$THEME_IDX]}
   INPUT=$(keyInput)
   case $INPUT in
-    'up')
+    up)
       [ $THEME_IDX -gt 0 ] && (( THEME_IDX -= 1 ));;
-    'down')
+    down)
       [ $THEME_IDX -lt $(( $TOTAL_THEMES - 1 )) ] && (( THEME_IDX += 1 ));;
-    'left')
+    left)
       [ $THEME_IDX -ge 10 ] && (( THEME_IDX -= 10 ));;
-    'right') 
+    right) 
       [ $THEME_IDX -lt $(( $TOTAL_THEMES - 10 )) ] && (( THEME_IDX += 10 ));;
-    'enter')
+    enter)
       applyTheme $THEME_NAME;;
-    'f') 
+    f) 
       flagAsFavourite $THEME_NAME
       FAV_THEMES=( $(ls $FAV_THEMES_PATH | sed 's/\.colors//g') )
       TOTAL_FAVS=${#FAV_THEMES[@]}
       sleep 1;;
-    'e')
+    e)
       editFile "$THEMES_PATH/$THEME_NAME.colors";;
-    'p')
+    p)
       COLOR_PREV=$(( ! $COLOR_PREV ));;
-    'v')
+    v)
       IS_VSCODE=$(( ! $IS_VSCODE ));;
-    'w')
+    w)
       IS_WALLPAPER=$(( ! $IS_WALLPAPER ));;
-    'q') 
+    q) 
       ctrl_c;;
-    'h')
+    h)
       showThemesHelp;;
-    '1'|'2'|'3')
+    1|2|3)
       CURRENT_WINDOW="$INPUT";;
     *)
       ;;
@@ -694,6 +693,13 @@ function manageThemes() {
 }
 
 function interactiveLoop() {
+  declare -i NUM_ELEMS=0
+  if [ $(tput lines) -gt $(( 25 + 8 )) ]; then
+    NUM_ELEMS=$(( $(tput lines) - 28 ))
+  else
+    NUM_ELEMS=$(( $(tput lines) - 20 ))
+  fi
+
   declare -a INVERTED_PATTERNS=()
 
   declare -a THEMES=( $(ls -p $THEMES_PATH | grep -v / | sed 's/\.colors//g') )
@@ -715,14 +721,14 @@ function interactiveLoop() {
   echo
   while true; do
     clear
-    gthemeLogo
+    [ $NUM_ELEMS -ge 15 ] && gthemeLogo
     showFlagStatus
     case $CURRENT_WINDOW in
-      "1")
+      1)
         showThemesInteractive;;
-      "2")
+      2)
         showPatternsInteractive;;
-      "3")
+      3)
         showFavsInteractive;;
     esac
   done
@@ -734,30 +740,30 @@ declare -gi IS_WALLPAPER=1
 function main() {
   while getopts "l:hi:n:p:vwa:r:f:" opt; do
     case $opt in
-      'l')
+      l)
         list $OPTARG
         exit 0;;
-      'h') 
+      h) 
         helpPanel
         exit 0;;
-      'a')
+      a)
         addPatterns "$(echo $OPTARG | sed 's/,/ /g')"
         exit 0;;
-      'r')
+      r)
         removePatterns "$(echo $OPTARG | sed 's/,/ /g')"
         exit 0;;
-      'f')
+      f)
         flagAsFavourite "$(echo $OPTARG | sed 's/,/ /g')"
         exit 0;;
-      'n')
+      n)
         declare THEME_NAME=$OPTARG;;
-      'p')
+      p)
         declare PATTERNS=$OPTARG;;
-      'i')
+      i)
         declare INVERTED_PATTERNS=$OPTARG;;
-      'v')
+      v)
         IS_VSCODE=0;;
-      'w')
+      w)
         IS_WALLPAPER=0;;
       *)
         helpPanel

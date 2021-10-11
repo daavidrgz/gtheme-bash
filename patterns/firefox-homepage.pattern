@@ -1,4 +1,4 @@
-%output-file%=
+%output-file%=/home/xxxx/.mozilla/firefox/homepage/app.css
 /* %theme-name% */
 
 @import url('assets/fonts/open-sans.css');

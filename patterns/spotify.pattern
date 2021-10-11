@@ -1,4 +1,4 @@
-%output-file%=
+%output-file%=/home/xxxx/.config/spicetify/Themes/Sleek/color.ini
 ; %theme-name%
 
 [Custom]
@@ -21,4 +21,4 @@ tab-active         = %background%
 notification       = %background%
 notification-error = %background%
 playback-bar       = %blue%
-misc               = FFFFFF
+misc               = %foreground%
