@@ -26,7 +26,9 @@ B_B="\e[1;7m" # With background
 ATTR_NAMES=("background" "foreground" "cursor" "selection-background" "selection-foreground" \
 "black" "black-hg" "red" "red-hg" "green" "green-hg" "yellow" "yellow-hg" "blue" "blue-hg" "magenta" "magenta-hg" "cyan" "cyan-hg" "white" "white-hg")
 
-GTHEME_PATH=$HOME/.config/gtheme
+CONFIG=${XDG_CONFIG_HOME:-$HOME/.config}
+
+GTHEME_PATH=$CONFIG/gtheme
 THEMES_PATH=$GTHEME_PATH/themes
 FAV_THEMES_PATH=$THEMES_PATH/fav-themes
 PATTERNS_PATH=$GTHEME_PATH/patterns
@@ -35,12 +37,12 @@ POSTSCRIPTS_PATH=$GTHEME_PATH/post-scripts
 CURRENT_THEME_FILE=$GTHEME_PATH/current-theme
 
 if [ ! -e $GTHEME_PATH ]; then
-  echo -e "\n${R}[!]${W} Gtheme folder not found! Ensure that ${W_B}$HOME/.config/gtheme${W} folder exists.\n"
+  echo -e "\n${R}[!]${W} Gtheme folder not found! Ensure that ${W_B}$CONFIG/gtheme${W} folder exists.\n"
   exit 1
 fi
 
 # •• Global Settings
-VSCODE_SETTINGS_FILE="$HOME/.config/Code/User/settings.json"
+VSCODE_SETTINGS_FILE="$CONFIG/Code/User/settings.json"
 
 trap ctrl_c INT
 function ctrl_c() {
@@ -53,6 +55,7 @@ function ctrl_c() {
 
 function helpPanel() {
   echo -e "\n${Y}[*]${W} Usage: gtheme [OPTIONS...]"
+  echo -e "\n${B}- To run interactively just give no options. -${W}"
   echo -e "\n${W_B}If the flag -p is not present${W}, the choosed theme will be applied to ${W_B}all active patterns${W} by default."
   echo -e "\nOPTIONS:
   ${G}-a${W} <PATT1,PATT2...>       activate selected patterns.
@@ -60,7 +63,7 @@ function helpPanel() {
   ${G}-p${W} <PATT1,PATT2...>       apply the theme only on selected patterns. Important: There must be no spaces between the patterns, only commas.
   ${G}-i${W} <PATT1,PATT2...>       invert the background and the foreground colors on selected patterns.
   ${G}-n${W} <THEME>                apply the specified <THEME>.
-  ${G}-f${W} <THEME1,THEME2...>     flag selected themes as favourite or unflag them if they're already in the fav-themes file.
+  ${G}-f${W} <THEME1,THEME2...>     flag selected themes as favourite or unflag them if they're in the fav-themes folder.
   ${G}-l${W} themes|patterns|favs   list all installed themes, patterns or favourite themes.
   ${G}-v${W}                        apply the VSCode theme.
   ${G}-w${W}                        apply the wallpaper.
@@ -78,13 +81,14 @@ function setWallpaper() {
   declare -r WALLPAPER=$(/bin/cat $THEMES_PATH/$1.colors | grep wallpaper | awk -F ': ' '{print $2}')
   [ -z "$WALLPAPER" ] && return 0
 
-  sed -i "s|.*WALLPAPER_URL=.*|WALLPAPER_URL=$WALLPAPER|" $WALLPAPER_SCRIPT
   if [ ! -x $WALLPAPER_SCRIPT ]; then
     echo -e "${R}•${W} $WALLPAPER_SCRIPT is not executable. Run chmod +x $WALLPAPER_SCRIPT to solve it!\n"
     return 1
   fi
 
-  if $WALLPAPER_SCRIPT; then
+  WALLPAPER_REAL_PATH="$(echo $WALLPAPER | sed "s|~|$HOME|")"
+
+  if $WALLPAPER_SCRIPT "$WALLPAPER_REAL_PATH"; then
     echo -e "${B}[+]${W} Wallpaper ${W_B}$(basename $WALLPAPER)${W} applied!\n"
 
     sed -i "/.*wallpaper.*/d" $CURRENT_THEME_FILE

@@ -49,7 +49,7 @@ It's required to know where to place the file generated, its name and extension.
 
 * Available keys: `%background%` `%foreground%` `%cursor%` `%selection-background%` `%selection-foreground%` `%black%` `%black-hg%` `%red%` `%red-hg%` `%green%` `%green-hg%` `%yellow%` `%yellow-hg%` `%blue%` `%blue-hg%` `%magenta%` `%magenta-hg%` `%cyan%` `%cyan-hg%` `%white%` `%white-hg%`.
 
-* The program will scan the pattern file and replace the keys with the associated color in the theme.<sup>[3](#no_color)</sup>
+* The program will scan the pattern and replace the keys with the associated color in the theme.<sup>[3](#no_color)</sup>
 
 ### Post-Scripts
 
@@ -59,9 +59,10 @@ It's required to know where to place the file generated, its name and extension.
 
 * The created file's path is sent to all the scripts as its first argument (see [kitty.sh](https://github.com/daavidrgz/gtheme/tree/master/post-scripts/kitty.sh)). 
 
-* The `wallpaper.sh` is a special type of post-script that is called when there is a wallpaper specified in the theme (and the flag `-w` is passed).
-Before, the value of the key `WALLPAPER_URL` inside the script will be replaced with the new wallpaper's path (see [wallpaper.sh](https://github.com/daavidrgz/gtheme/tree/master/post-scripts/wallpaper.sh)).  
-You can reference this new script in your WM configuration file to set it after every boot.
+* The `wallpaper.sh` is a special type of post-script that is called when there is a wallpaper specified in the theme (and the flag `-w` is passed).  
+	The first argument recieved by the script will be the new wallpaper's url (see [wallpaper.sh](https://github.com/daavidrgz/gtheme/tree/master/post-scripts/wallpaper.sh)).  
+	Because of feh generates a script with the last wallpaper you set as background in `~/.fehbg`, you can now reference it to set the theme's wallpaper after
+	every boot.
 
 ***
 
