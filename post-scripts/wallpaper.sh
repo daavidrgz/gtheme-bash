@@ -9,7 +9,6 @@ feh --bg-fill "$WALLPAPER_URL"
 
 echo -e "${Y}•${W} Root privileges are needed in order to apply the wallpaper to lightdm webkit theme aether!\n"
 LIGHTDM_WALLPAPER=/usr/share/lightdm-webkit/themes/lightdm-webkit-theme-aether/src/img/wallpapers/wallpaper
-sudo rm $LIGHTDM_WALLPAPER
 sudo cp $WALLPAPER_URL $LIGHTDM_WALLPAPER
 echo -e "Created wallpaper file in ${W_B}$LIGHTDM_WALLPAPER!${W}"
 

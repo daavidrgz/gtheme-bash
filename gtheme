@@ -2,8 +2,8 @@
 
 #  ██████╗ ████████╗██╗  ██╗███████╗███╗   ███╗███████╗
 # ██╔════╝ ╚══██╔══╝██║  ██║██╔════╝████╗ ████║██╔════╝
-# ██║  ███╗   ██║   ███████║█████╗  ██╔████╔██║█████╗  
-# ██║   ██║   ██║   ██╔══██║██╔══╝  ██║╚██╔╝██║██╔══╝  
+# ██║  ███╗   ██║   ███████║█████╗  ██╔████╔██║█████╗
+# ██║   ██║   ██║   ██╔══██║██╔══╝  ██║╚██╔╝██║██╔══╝
 # ╚██████╔╝   ██║   ██║  ██║███████╗██║ ╚═╝ ██║███████╗
 #  ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝╚══════╝
 # By David Rodríguez - @daavidrgz
@@ -381,7 +381,7 @@ function showPatternsHelp() {
     clear
     gthemeLogo
     echo -e "${Y}╭─── HELP ──────────────────────────────────╮"
-    echo -e "${Y}│                                           │" 
+    echo -e "${Y}│                                           │"
 
     echo -e "${Y}│  ${B}'enter'${W}  activate/desactivate pattern    ${Y}│"
     echo -e "${Y}│  ${B}'up'${W}     previous pattern                ${Y}│"
@@ -398,13 +398,13 @@ function showThemesHelp() {
     clear
     gthemeLogo
     echo -e "${Y}╭─── HELP ──────────────────────────────────╮"
-    echo -e "${Y}│                                           │" 
+    echo -e "${Y}│                                           │"
 
     echo -e "${Y}│  ${B}'enter'${W}  apply theme                     ${Y}│"
     echo -e "${Y}│  ${B}'up'${W}     previous theme                  ${Y}│"
     echo -e "${Y}│  ${B}'down'${W}   next theme                      ${Y}│"
     echo -e "${Y}│  ${B}'left'${W}   10 previous themes              ${Y}│"
-    echo -e "${Y}│  ${B}'right'${W}  10 next themes                  ${Y}│" 
+    echo -e "${Y}│  ${B}'right'${W}  10 next themes                  ${Y}│"
     echo -e "${Y}│  ${B}'f'${W}      flag/unflag as favourite        ${Y}│"
 
     showCommonHelp || break
@@ -682,11 +682,11 @@ function manageThemes() {
       [ $THEME_IDX -lt $(( $TOTAL_THEMES - 1 )) ] && (( THEME_IDX += 1 ));;
     left)
       [ $THEME_IDX -ge 10 ] && (( THEME_IDX -= 10 ));;
-    right) 
+    right)
       [ $THEME_IDX -lt $(( $TOTAL_THEMES - 10 )) ] && (( THEME_IDX += 10 ));;
     enter)
       applyTheme $THEME_NAME;;
-    f) 
+    f)
       flagAsFavourite $THEME_NAME
       FAV_THEMES=( $(ls $FAV_THEMES_PATH | sed 's/\.colors//g') )
       TOTAL_FAVS=${#FAV_THEMES[@]}
