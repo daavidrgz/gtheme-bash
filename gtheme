@@ -31,13 +31,29 @@ CONFIG=${XDG_CONFIG_HOME:-$HOME/.config}
 GTHEME_PATH=$CONFIG/gtheme
 THEMES_PATH=$GTHEME_PATH/themes
 FAV_THEMES_PATH=$THEMES_PATH/fav-themes
-PATTERNS_PATH=$GTHEME_PATH/patterns
+BACKUP_PATH=$GTHEME_PATH/backup
+
+DESKTOPS_PATH=$GTHEME_PATH/desktops
+ACTIVE_DESKTOP=$DESKTOPS_PATH/active-desktop
+GTHEME_CURRENT_DESKTOP=$ACTIVE_DESKTOP/gtheme
+
+PATTERNS_PATH=$GTHEME_CURRENT_DESKTOP/patterns
 ACTIVE_PATTERNS_PATH=$PATTERNS_PATH/active-patterns
-POSTSCRIPTS_PATH=$GTHEME_PATH/post-scripts
-CURRENT_THEME_FILE=$GTHEME_PATH/current-theme
+POSTSCRIPTS_PATH=$GTHEME_CURRENT_DESKTOP/post-scripts
+CURRENT_THEME_FILE=$GTHEME_CURRENT_DESKTOP/current-theme
 
 if [ ! -e $GTHEME_PATH ]; then
   echo -e "\n${R}[!]${W} Gtheme folder not found! Ensure that ${W_B}$CONFIG/gtheme${W} folder exists.\n"
+  exit 1
+fi
+
+if [ ! -e $ACTIVE_DESKTOP ]; then
+  echo -e "\n${R}[!]${W} There is no desktop selected! Create a symlink to a desktop folder in ${W_B}$DESKTOPS_PATH${W}.\n"
+  exit 1
+fi
+
+if [ ! -e $GTHEME_CURRENT_DESKTOP ]; then
+  echo -e "\n${R}[!]${W} Gtheme folder not found in the current desktop ${W_B}$(realpath $ACTIVE_DESKTOP)${W}!\n"
   exit 1
 fi
 
@@ -190,6 +206,8 @@ function generateFiles() {
   declare -r THEME_NAME="$1"
   declare PATTERNS="$2"
   declare -r INVERTED_PATTERNS="$3"
+
+  [ ! -e $CURRENT_THEME_FILE ] && touch $CURRENT_THEME_FILE
 
   [ -z "$PATTERNS" ] && PATTERNS="$(ls $ACTIVE_PATTERNS_PATH | sed 's/.pattern//g' )"
 
@@ -372,22 +390,39 @@ function keyInput() {
     1) echo "1";;
     2) echo "2";;
     3) echo "3";;
+    4) echo "4";;
     *) echo "invalid"
   esac
+}
+
+function showDesktopsHelp() {
+  while true; do
+    clear
+    gthemeLogo
+    echo -e "${Y}╭─── HELP ───────────────────────────────────╮"
+    echo -e "${Y}│                                            │"
+
+    echo -e "${Y}│  ${B}'up'${W}       previous desktop               ${Y}│"
+    echo -e "${Y}│  ${B}'down'${W}     next desktop                   ${Y}│"
+    echo -e "${Y}│  ${B}'enter'${W}    apply desktop                  ${Y}│"
+
+    showCommonHelp || break
+  done
 }
 
 function showPatternsHelp() {
   while true; do
     clear
     gthemeLogo
-    echo -e "${Y}╭─── HELP ──────────────────────────────────╮"
-    echo -e "${Y}│                                           │"
+    echo -e "${Y}╭─── HELP ───────────────────────────────────╮"
+    echo -e "${Y}│                                            │"
 
-    echo -e "${Y}│  ${B}'enter'${W}  activate/desactivate pattern    ${Y}│"
-    echo -e "${Y}│  ${B}'up'${W}     previous pattern                ${Y}│"
-    echo -e "${Y}│  ${B}'down'${W}   next pattern                    ${Y}│"
-    echo -e "${Y}│  ${B}'i'${W}      toggle invert pattern           ${Y}│"
-    echo -e "${Y}│  ${B}'p'${W}      edit pattern's post-script      ${Y}│"
+    echo -e "${Y}│  ${B}'enter'${W}    activate/desactivate pattern   ${Y}│"
+    echo -e "${Y}│  ${B}'up'${W}       previous pattern               ${Y}│"
+    echo -e "${Y}│  ${B}'down'${W}     next pattern                   ${Y}│"
+    echo -e "${Y}│  ${B}'i'${W}        toggle invert pattern          ${Y}│"
+    echo -e "${Y}│  ${B}'p'${W}        edit pattern's post-script     ${Y}│"
+    echo -e "${Y}│  ${B}'e'${W}        edit file in \$VISUAL env var   ${Y}│"
 
     showCommonHelp || break
   done
@@ -397,33 +432,73 @@ function showThemesHelp() {
   while true; do
     clear
     gthemeLogo
-    echo -e "${Y}╭─── HELP ──────────────────────────────────╮"
-    echo -e "${Y}│                                           │"
+    echo -e "${Y}╭─── HELP ───────────────────────────────────╮"
+    echo -e "${Y}│                                            │"
 
-    echo -e "${Y}│  ${B}'enter'${W}  apply theme                     ${Y}│"
-    echo -e "${Y}│  ${B}'up'${W}     previous theme                  ${Y}│"
-    echo -e "${Y}│  ${B}'down'${W}   next theme                      ${Y}│"
-    echo -e "${Y}│  ${B}'left'${W}   10 previous themes              ${Y}│"
-    echo -e "${Y}│  ${B}'right'${W}  10 next themes                  ${Y}│"
-    echo -e "${Y}│  ${B}'f'${W}      flag/unflag as favourite        ${Y}│"
+    echo -e "${Y}│  ${B}'enter'${W}    apply theme                    ${Y}│"
+    echo -e "${Y}│  ${B}'up'${W}       previous theme                 ${Y}│"
+    echo -e "${Y}│  ${B}'down'${W}     next theme                     ${Y}│"
+    echo -e "${Y}│  ${B}'left'${W}     10 previous themes             ${Y}│"
+    echo -e "${Y}│  ${B}'right'${W}    10 next themes                 ${Y}│"
+    echo -e "${Y}│  ${B}'f'${W}        flag/unflag as favourite       ${Y}│"
+    echo -e "${Y}│  ${B}'e'${W}        edit file in \$VISUAL env var   ${Y}│"
 
     showCommonHelp || break
   done
 }
 
 function showCommonHelp() {
-  echo -e "${Y}│  ${B}'e'${W}      edit file in \$VISUAL env var    ${Y}│"
-  echo -e "${Y}│  ${B}'c'${W}      toggle colors preview           ${Y}│"
-  echo -e "${Y}│  ${B}'w'${W}      toggle apply wallpaper          ${Y}│"
-  echo -e "${Y}│  ${B}'v'${W}      toggle apply vscode theme       ${Y}│"
-  echo -e "${Y}│  ${B}'q'${W}      quit                            ${Y}│"
-  echo -e "${Y}│  ${B}'h'${W}      show/hide this panel            ${Y}│"
-  echo -e "${Y}│  ${B}'1|2|3'${W}  themes|patterns|favs view       ${Y}│"
+  echo -e "${Y}│  ${B}'c'${W}        toggle colors preview          ${Y}│"
+  echo -e "${Y}│  ${B}'w'${W}        toggle apply wallpaper         ${Y}│"
+  echo -e "${Y}│  ${B}'v'${W}        toggle apply vscode theme      ${Y}│"
+  echo -e "${Y}│  ${B}'q'${W}        quit                           ${Y}│"
+  echo -e "${Y}│  ${B}'h'${W}        show/hide this panel           ${Y}│"
+  echo -e "${Y}│  ${B}'1|2|3|4'${W}  desktops|patterns|themes|favs  ${Y}│"
 
-  echo -e "${Y}╰───────────────────────────────────────────╯${W}"
+  echo -e "${Y}╰────────────────────────────────────────────╯${W}"
+
   INPUT=$(keyInput)
   [ "$INPUT" == "h" ] && return 1
   [ "$INPUT" == "q" ] && ctrl_c
+  return 0
+}
+
+function backupFolder() {
+  declare -r FOLDER_NAME="$1"
+
+  declare -r USER_FOLDER=$HOME/.config/$FOLDER_NAME
+
+  [ ! -e $USER_FOLDER ] && return 1
+
+  cp -r $USER_FOLDER $BACKUP_PATH
+
+  echo -e "${G}•${W} Folder ${W_B}$USER_FOLDER${W} already exists, backing it up in ${W_B}$BACKUP_PATH${W}..."
+  return 0
+}
+
+function applyDesktop() {
+  declare -r DESKTOP_NAME="$1"
+  declare USER_FOLDER
+
+  for folder in $DESKTOPS_PATH/$DESKTOP_NAME/.config/*; do
+    echo -e "${B}•${W} Moving ${W_B}$(basename $folder)/${W}..."
+
+    [ $(basename $(realpath $ACTIVE_DESKTOP)) == "init" ] && backupFolder $(basename $folder)
+
+    USER_FOLDER=$HOME/.config/$(basename $folder)
+    [ -e $USER_FOLDER ] && rm -rf $USER_FOLDER
+    cp -r $folder $HOME/.config
+
+    echo -e "${G}• Done!${W}\n"
+  done
+
+  # echo -e "${B}•${W} Applying the associated theme..."
+  # generateFiles
+  # echo -e "${G}•${W} ${W_B}${W} theme applied!"
+
+  rm $DESKTOPS_PATH/active-desktop
+  ln -s $DESKTOP_NAME $DESKTOPS_PATH/active-desktop
+  echo -e "${G}•${W} Desktop ${B}$DESKTOP_NAME${W} applied!"
 }
 
 function applyTheme() {
@@ -494,31 +569,90 @@ function showColorPreview() {
   echo -e "${F_C}╰─────────────────────────────────────────╯${W}\n"
 }
 
+function showDesktopsInteractive() {
+  declare -i SHOWN_ELEMS=0
+  declare PRINT_DESKTOP
+
+  declare -i c=$(( $DESKTOP_IDX - $NUM_ELEMS/2 - 1 ))
+  [ $(( $c + $NUM_ELEMS + 2 )) -gt $TOTAL_DESKTOPS ] && (( c = $TOTAL_DESKTOPS - $NUM_ELEMS - 2 ))
+
+  echo -e "${C}╭─── ${B_B}DESKTOPS${W}${C} ── PATTERNS ── THEMES ── FAVS ───╮"
+  echo -e "${C}│                                              │"
+  while [ $SHOWN_ELEMS -le $(( $NUM_ELEMS )) ]; do
+    (( c += 1 ))
+    [ $c -lt 0 ] && continue
+
+    if [ $c -lt $TOTAL_DESKTOPS ]; then
+      PRINT_DESKTOP="${DESKTOPS[$c]}"
+      [ $(basename $(realpath $ACTIVE_DESKTOP)) == ${DESKTOPS[$c]} ] && PRINT_DESKTOP="$PRINT_DESKTOP [active]"
+
+      if [ $c -eq $DESKTOP_IDX ]; then
+        printf "${C}│ ${C}‣ %-46s ${C}│\n" "$PRINT_DESKTOP ↓ ↑"
+      else
+        printf "${C}│ ${DIM}  %-42s${W} ${C}│\n" "$PRINT_DESKTOP"
+      fi
+
+    else
+      echo -e "${C}│                                              │"
+    fi
+
+    (( SHOWN_ELEMS += 1 ))
+  done
+  echo -e "${C}╰──────────────────────────────────────────────╯${W}"
+
+  manageDesktops
+}
+
+function manageDesktops() {
+  DESKTOP_NAME=${DESKTOPS[$DESKTOP_IDX]}
+  INPUT=$(keyInput)
+  case $INPUT in
+    up)
+      [ $DESKTOP_IDX -gt 0 ] && (( DESKTOP_IDX -= 1 ));;
+    down)
+      [ $DESKTOP_IDX -lt $(( $TOTAL_DESKTOPS - 1 )) ] && (( DESKTOP_IDX += 1 ));;
+    enter)
+      applyDesktop $DESKTOP_NAME;;
+    c)
+      COLOR_PREV=$(( ! $COLOR_PREV ));;
+    v)
+      IS_VSCODE=$(( ! $IS_VSCODE ));;
+    w)
+      IS_WALLPAPER=$(( ! $IS_WALLPAPER ));;
+    q) 
+      ctrl_c;;
+    h)
+      showDesktopsHelp;;
+    1|2|3|4)
+      CURRENT_WINDOW="$INPUT";;
+  esac
+}
+
 function showFavsInteractive() {
   declare -i SHOWN_ELEMS=0
 
   declare -i c=$(( $FAV_IDX - $NUM_ELEMS/2 - 1 ))
   [ $(( $c + $NUM_ELEMS + 2 )) -gt $TOTAL_FAVS ] && (( c = $TOTAL_FAVS - $NUM_ELEMS - 2 ))
 
-  echo -e "${G}╭──── THEMES ──── PATTERNS ──── ${B_B}FAVS${W}${G} ────╮"
-  echo -e "${G}│                                        │"
+  echo -e "${G}╭─── DESKTOPS ── PATTERNS ── THEMES ── ${B_B}FAVS${W}${G} ───╮"
+  echo -e "${G}│                                              │"
   while [ $SHOWN_ELEMS -le $(( $NUM_ELEMS )) ]; do
     (( c += 1 ))
     [ $c -lt 0 ] && continue
 
     if [ $c -lt $TOTAL_FAVS ]; then
       if [ $c -eq $FAV_IDX ]; then
-        printf "${G}│ ${G}‣ %-40s ${G}│\n" "${FAV_THEMES[$c]} ↓ ↑"
+        printf "${G}│ ${G}‣ %-46s ${G}│\n" "${FAV_THEMES[$c]} ↓ ↑"
       else
-        printf "${G}│ ${DIM}  %-36s${W} ${G}│\n" "${FAV_THEMES[$c]}"
+        printf "${G}│ ${DIM}  %-42s${W} ${G}│\n" "${FAV_THEMES[$c]}"
       fi
     else
-      echo -e "${G}│                                        │"
+      echo -e "${G}│                                              │"
     fi
 
     (( SHOWN_ELEMS += 1 ))
   done
-  echo -e "${G}╰────────────────────────────────────────╯${W}"
+  echo -e "${G}╰──────────────────────────────────────────────╯${W}"
 
   showColorPreview "${FAV_THEMES[$FAV_IDX]}" "${G}"
 
@@ -556,7 +690,7 @@ function manageFavs() {
       ctrl_c;;
     h)
       showThemesHelp;;
-    1|2|3)
+    1|2|3|4)
       CURRENT_WINDOW="$INPUT";;
   esac
 }
@@ -567,8 +701,8 @@ function showPatternsInteractive() {
   declare -i c=$(( $PATTERN_IDX - $NUM_ELEMS/2 - 1 ))
   [ $(( $c + $NUM_ELEMS + 2 )) -gt $TOTAL_PATTERNS ] && (( c = $TOTAL_PATTERNS - $NUM_ELEMS - 2 ))
 
-  echo -e "${M}╭──── THEMES ──── ${B_B}PATTERNS${W}${M} ──── FAVS ────╮"
-  echo -e "${M}│                                        │"
+  echo -e "${M}╭─── DESKTOPS ── ${B_B}PATTERNS${W}${M} ── THEMES ── FAVS ───╮"
+  echo -e "${M}│                                              │"
   while [ $SHOWN_ELEMS -le $(( $NUM_ELEMS )) ]; do
     (( c += 1 ))
     [ $c -lt 0 ] && continue
@@ -587,17 +721,17 @@ function showPatternsInteractive() {
       fi
 
       if [[ " ${INVERTED_PATTERNS[@]} " =~ " ${PATTERNS[$c]} " ]]; then
-        printf "${C}%-5s${M}│\n" "Inv"
+        printf "${C}%-11s${M}│\n" "Inv"
       else
-        printf "%-5s${M}│\n" " "
+        printf "%-11s${M}│\n" " "
       fi
     else
-      echo -e "${M}│                                        │"
+      echo -e "${M}│                                              │"
     fi
 
     (( SHOWN_ELEMS += 1 ))
   done
-  echo -e "${M}╰────────────────────────────────────────╯${W}"
+  echo -e "${M}╰──────────────────────────────────────────────╯${W}"
 
   managePatterns
 }
@@ -638,7 +772,7 @@ function managePatterns() {
       showPatternsHelp;;
     q)
       ctrl_c;;
-    1|2|3)
+    1|2|3|4)
       CURRENT_WINDOW="$INPUT";;
   esac
 }
@@ -649,23 +783,23 @@ function showThemesInteractive() {
   declare -i c=$(( $THEME_IDX - $NUM_ELEMS/2 - 1 ))
   [ $(( $c + $NUM_ELEMS + 2 )) -gt $TOTAL_THEMES ] && (( c = $TOTAL_THEMES - $NUM_ELEMS - 2 ))
 
-  echo -e "${B}╭──── ${B_B}THEMES${W}${B} ──── PATTERNS ──── FAVS ────╮"
-  echo -e "${B}│                                        │"
+  echo -e "${B}╭─── DESKTOPS ── PATTERNS ── ${B_B}THEMES${W}${B} ── FAVS ───╮"
+  echo -e "${B}│                                              │"
   while [ $SHOWN_ELEMS -le $(( $NUM_ELEMS )) ]; do
     (( c += 1 ))
     [ $c -lt 0 ] && continue
 
     if [ $c -lt $TOTAL_THEMES ]; then
       if [ $c -eq $THEME_IDX ]; then
-        printf "${B}│ ${B}‣ %-40s ${B}│\n" "${THEMES[$c]} ↓ ↑"
+        printf "${B}│ ${B}‣ %-46s ${B}│\n" "${THEMES[$c]} ↓ ↑"
       else
-        printf "${B}│ ${DIM}  %-36s${W} ${B}│\n" "${THEMES[$c]}"
+        printf "${B}│ ${DIM}  %-42s${W} ${B}│\n" "${THEMES[$c]}"
       fi
     fi
 
     (( SHOWN_ELEMS += 1 ))
   done
-  echo -e "${B}╰────────────────────────────────────────╯${W}"
+  echo -e "${B}╰──────────────────────────────────────────────╯${W}"
 
   showColorPreview "${THEMES[$THEME_IDX]}" "${B}"
 
@@ -703,7 +837,7 @@ function manageThemes() {
       ctrl_c;;
     h)
       showThemesHelp;;
-    1|2|3)
+    1|2|3|4)
       CURRENT_WINDOW="$INPUT";;
   esac
 }
@@ -718,18 +852,23 @@ function interactiveLoop() {
 
   declare -a INVERTED_PATTERNS=()
 
-  declare -a THEMES=( $(ls -p $THEMES_PATH | grep -v / | sed 's/\.colors//g') )
-  declare -i TOTAL_THEMES=${#THEMES[@]}
+  declare -a DESKTOPS=( $(ls $DESKTOPS_PATH | grep -v "active-desktop") )
+  declare -i TOTAL_DESKTOPS=${#DESKTOPS[@]}
 
   declare -a PATTERNS=( $(ls -p $PATTERNS_PATH | grep -v / | sed 's/\.pattern//g') )
   declare -i TOTAL_PATTERNS=${#PATTERNS[@]}
 
+  declare -a THEMES=( $(ls -p $THEMES_PATH | grep -v / | sed 's/\.colors//g') )
+  declare -i TOTAL_THEMES=${#THEMES[@]}
+
   declare -a FAV_THEMES=( $(ls $FAV_THEMES_PATH | sed 's/\.colors//g') )
   declare -i TOTAL_FAVS=${#FAV_THEMES[@]}
 
-  declare -i THEME_IDX=0
+  declare -i DESKTOP_IDX=0
   declare -i PATTERN_IDX=0
+  declare -i THEME_IDX=0
   declare -i FAV_IDX=0
+
   declare CURRENT_WINDOW="1"
   declare -i COLOR_PREV=0
 
@@ -741,10 +880,12 @@ function interactiveLoop() {
     showFlagStatus
     case $CURRENT_WINDOW in
       1)
-        showThemesInteractive;;
+        showDesktopsInteractive;;
       2)
         showPatternsInteractive;;
       3)
+        showThemesInteractive;;
+      4)
         showFavsInteractive;;
     esac
   done
