@@ -46,13 +46,12 @@ function copyFiles() {
 				rollback
 			fi
 
-			[ "$FOLDER" == "patterns" ] && mkdir $GTHEME_PATH/$FOLDER/active-patterns
 			[ "$FOLDER" == "themes" ] && mkdir $GTHEME_PATH/$FOLDER/fav-themes
 		done
 		echo -e "${G}• Done!${W}\n"
 
 	else
-		echo -e "${Y}•${W} It looks like you have already installed gtheme. Skipping the main gtheme folder copy...\n"
+		echo -e "${Y}•${W} It looks like you have already installed gtheme. Skipping the main gtheme folder copy in ${W_B}$GTHEME_PATH"${W}...\n"
 	fi
 
 	echo -e "${G}•${W} Copying gtheme script to ${W_B}/usr/bin${W}..."
