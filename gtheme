@@ -34,7 +34,7 @@ FAV_THEMES_PATH=$THEMES_PATH/fav-themes
 BACKUP_PATH=$GTHEME_PATH/backup
 
 DESKTOPS_PATH=$GTHEME_PATH/desktops
-ACTIVE_DESKTOP=$DESKTOPS_PATH/active-desktop
+ACTIVE_DESKTOP=$(realpath $DESKTOPS_PATH/active-desktop)
 GTHEME_CURRENT_DESKTOP=$ACTIVE_DESKTOP/gtheme
 
 PATTERNS_PATH=$GTHEME_CURRENT_DESKTOP/patterns
@@ -104,7 +104,7 @@ function setWallpaper() {
 
   WALLPAPER_REAL_PATH="$(echo $WALLPAPER | sed "s|~|$HOME|")"
 
-  if $WALLPAPER_SCRIPT "$WALLPAPER_REAL_PATH"; then
+  if $WALLPAPER_SCRIPT "$WALLPAPER_REAL_PATH" "nolightdm"; then
     echo -e "${B}[+]${W} Wallpaper ${W_B}$(basename $WALLPAPER)${W} applied!\n"
 
     sed -i "/.*wallpaper.*/d" $CURRENT_THEME_FILE
@@ -399,7 +399,7 @@ function showDesktopsHelp() {
   while true; do
     clear
     gthemeLogo
-    echo -e "${Y}╭─── HELP ───────────────────────────────────╮"
+    echo -e "${Y}╭─── HELP DESKTOPS ──────────────────────────╮"
     echo -e "${Y}│                                            │"
 
     echo -e "${Y}│  ${B}'up'${W}       previous desktop               ${Y}│"
@@ -414,7 +414,7 @@ function showPatternsHelp() {
   while true; do
     clear
     gthemeLogo
-    echo -e "${Y}╭─── HELP ───────────────────────────────────╮"
+    echo -e "${Y}╭─── HELP PATTERNS ──────────────────────────╮"
     echo -e "${Y}│                                            │"
 
     echo -e "${Y}│  ${B}'enter'${W}    activate/desactivate pattern   ${Y}│"
@@ -432,7 +432,7 @@ function showThemesHelp() {
   while true; do
     clear
     gthemeLogo
-    echo -e "${Y}╭─── HELP ───────────────────────────────────╮"
+    echo -e "${Y}╭─── HELP THEMES ────────────────────────────╮"
     echo -e "${Y}│                                            │"
 
     echo -e "${Y}│  ${B}'enter'${W}    apply theme                    ${Y}│"
@@ -480,6 +480,14 @@ function applyDesktop() {
   declare -r DESKTOP_NAME="$1"
   declare USER_FOLDER
 
+  echo -e "${B}•${W} Removing previous desktop folders...\n"
+  for folder in $ACTIVE_DESKTOP/.config/*; do
+    USER_FOLDER=$HOME/.config/$(basename $folder)
+    rm -rf $USER_FOLDER
+    echo -e "${B}•${W} Removed ${W_B}$USER_FOLDER${W}"
+  done
+  echo
+
   for folder in $DESKTOPS_PATH/$DESKTOP_NAME/.config/*; do
     echo -e "${B}•${W} Moving ${W_B}$(basename $folder)/${W}..."
 
@@ -492,13 +500,30 @@ function applyDesktop() {
     echo -e "${G}• Done!${W}\n"
   done
 
-  # echo -e "${B}•${W} Applying the associated theme..."
-  # generateFiles
-  # echo -e "${G}•${W} ${W_B}${W} theme applied!"
-
   rm $DESKTOPS_PATH/active-desktop
   ln -s $DESKTOP_NAME $DESKTOPS_PATH/active-desktop
   echo -e "${G}•${W} Desktop ${B}$DESKTOP_NAME${W} applied!"
+
+  declare -r DESKTOP_START_SCRIPT=$DESKTOPS_PATH/active-desktop/gtheme/post-scripts/desktop-start.sh
+  echo -e "${B}•${W} Trying to execute ${W_B}$DESKTOP_START_SCRIPT${W} desktop start script...\n"
+  if [ -e $DESKTOP_START_SCRIPT ]; then
+    if ! $DESKTOP_START_SCRIPT; then
+      echo -e "\n${R}[${W} Press any key to continue ${R}]${W}\n"
+      keyInput &>/dev/null
+    fi
+  else
+    echo -e "${R}[!]${W} There is no desktop start post-script, consider creating it to set a new theme on desktop change!\n"
+  fi
+
+  echo -e "${B}•${W} Trying to execute ${W_B}$POSTSCRIPTS_PATH/desktop-restart.sh${W} to restart the wm...\n"
+  if [ -e $POSTSCRIPTS_PATH/desktop-restart.sh ]; then
+    $POSTSCRIPTS_PATH/desktop-restart.sh && return 0
+
+    echo -e "\n${R}[${W} Press any key to continue ${R}]${W}\n"
+    keyInput &>/dev/null
+  else
+    echo -e "${R}[!]${W} There is no desktop restart post-script, consider creating it to restart your wm!\n"
+  fi
 }
 
 function applyTheme() {
