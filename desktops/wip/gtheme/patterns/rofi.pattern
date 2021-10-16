@@ -1,0 +1,12 @@
+%output-file%=/home/david/.config/rofi/colors.rasi
+// %theme-name%
+
+* {
+  bg:				#%background%;
+  fg:				#%foreground%;
+  accent:		#%magenta%;
+  button:   #%magenta%66;
+
+  background-color:		@bg;
+  text-color:			    @fg;
+}

@@ -1,0 +1,47 @@
+%output-file%=/home/david/.config/alacritty/alacritty.yml
+# %theme-name%
+
+window:
+  padding:
+    x: 20
+    y: 20
+  dyanmic_padding: true
+  
+font:
+  normal:
+    family: UbuntuMono Nerd Font Mono
+  bold:
+    family: UbuntuMono Nerd Font Mono 
+  italic:
+    family: UbuntuMono Nerd Font Mono
+  size: 10
+  offset:
+    x: 0
+    y: 1
+  draw_bold_text_with_bright_colors: true
+
+colors:
+  cursor:
+    text: '0x%foreground%'
+    cursor: '0x%cursor%'
+  primary:
+    background: '0x%background%'
+    foreground: '0x%foreground%'
+  normal:
+    black: '0x%black%'
+    red: '0x%red%'
+    green: '0x%green%'
+    yellow: '0x%yellow%'
+    blue: '0x%blue%'
+    magenta: '0x%magenta%'
+    cyan: '0x%cyan%'
+    white: '0x%white%'
+  bright:
+    black: '0x%black-hg%'
+    red: '0x%red-hg%'
+    green: '0x%green-hg%'
+    yellow: '0x%yellow-hg%'
+    blue: '0x%blue-hg%'
+    magenta: '0x%magenta-hg%'
+    cyan: '0x%cyan-hg%'
+    white: '0x%white-hg%'

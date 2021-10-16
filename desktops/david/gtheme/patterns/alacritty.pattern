@@ -5,7 +5,6 @@ window:
   padding:
     x: 10
     y: 10
-  opacity: 0.5
   dyanmic_padding: true
   
 font:
@@ -27,29 +26,29 @@ cursor:
 
 colors:
   cursor:
-    text: "#%foreground%"
-    cursor: "#%cursor%"
-  selection:
-    text: "#%background%"
-    background: "#%selection-background%"
+    text: '0x%foreground%'
+    cursor: '0x%cursor%'
+  #selection:
+  #  text: '0x%selection-foreground%'
+  #  background: '0x%selection-background%'
   primary:
-    background: "#%background%"
-    foreground: "#%foreground%"
+    background: '0x%background%'
+    foreground: '0x%foreground%'
   normal:
-    black: "#%black%"
-    red: "#%red%"
-    green: "#%green%"
-    yellow: "#%yellow%"
-    blue: "#%blue%"
-    magenta: "#%magenta%"
-    cyan: "#%cyan%"
-    white: "#%white%"
+    black: '0x%black%'
+    red: '0x%red%'
+    green: '0x%green%'
+    yellow: '0x%yellow%'
+    blue: '0x%blue%'
+    magenta: '0x%magenta%'
+    cyan: '0x%cyan%'
+    white: '0x%white%'
   bright:
-    black: "#%black-hg%"
-    red: "#%red-hg%"
-    green: "#%green-hg%"
-    yellow: "#%yellow-hg%"
-    blue: "#%blue-hg%"
-    magenta: "#%magenta-hg%"
-    cyan: "#%cyan-hg%"
-    white: "#%white-hg%"
+    black: '0x%black-hg%'
+    red: '0x%red-hg%'
+    green: '0x%green-hg%'
+    yellow: '0x%yellow-hg%'
+    blue: '0x%blue-hg%'
+    magenta: '0x%magenta-hg%'
+    cyan: '0x%cyan-hg%'
+    white: '0x%white-hg%'
