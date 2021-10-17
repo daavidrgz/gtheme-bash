@@ -104,7 +104,7 @@ function setWallpaper() {
 
   WALLPAPER_REAL_PATH="$(echo $WALLPAPER | sed "s|~|$HOME|")"
 
-  if $WALLPAPER_SCRIPT "$WALLPAPER_REAL_PATH" "nolightdm"; then
+  if $WALLPAPER_SCRIPT "$WALLPAPER_REAL_PATH"; then
     echo -e "${B}[+]${W} Wallpaper ${W_B}$(basename $WALLPAPER)${W} applied!\n"
 
     sed -i "/.*wallpaper.*/d" $CURRENT_THEME_FILE
@@ -491,10 +491,10 @@ function applyDesktop() {
   for folder in $DESKTOPS_PATH/$DESKTOP_NAME/.config/*; do
     echo -e "${B}•${W} Moving ${W_B}$(basename $folder)/${W}..."
 
-    [ $(basename $(realpath $ACTIVE_DESKTOP)) == "init" ] && backupFolder $(basename $folder)
+    [ $(basename $(realpath $ACTIVE_DESKTOP)) == "init" ] && cp -r $HOME/.config $BACKUP_PATH
 
     USER_FOLDER=$HOME/.config/$(basename $folder)
-    [ -e $USER_FOLDER ] && rm -rf $USER_FOLDER
+    [[ -e $USER_FOLDER && $(realpath $USER_FOLDER) != "$HOME/.config" ]] && rm -rf $USER_FOLDER
     cp -r $folder $HOME/.config
 
     echo -e "${G}• Done!${W}\n"

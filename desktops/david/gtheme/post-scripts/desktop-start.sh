@@ -1,4 +1,4 @@
 #!/bin/sh
 
-gtheme -n Everforest-Dark-Hard -i polybar -vw
+gtheme -n Snazzy -vw
 exit 0
