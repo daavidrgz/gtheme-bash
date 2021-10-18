@@ -52,7 +52,7 @@ gradient_id_pressed = 0
 # Panel
 panel_items = P:B:PPPT:C:P
 panel_size = 50% 50
-panel_margin = 20 7
+panel_margin = 10 7
 panel_padding = 10 4 4
 panel_background_id = 1
 wm_menu = 1
@@ -63,7 +63,7 @@ panel_layer = top
 panel_monitor = all
 panel_shrink = 0
 autohide = 0
-autohide_show_timeout = 0.5
+autohide_show_timeout = 0
 autohide_hide_timeout = 0.2
 autohide_height = 1
 strut_policy = follow_size

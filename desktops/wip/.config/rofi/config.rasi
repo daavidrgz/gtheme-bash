@@ -1,6 +1,6 @@
 configuration {
 	modi:				          "drun";
-	font:				          "DejaVuSansMono Nerd Font 10";
+	font:				          "DejaVuSansMono Nerd Font Bold 10";
 	show-icons:           true;
 	icon-theme: 			    "Papirus";
 	display-drun: 		    "";
@@ -49,6 +49,7 @@ listview {
 	cycle:                          false;
 	dynamic:                        true;
 	layout:                         vertical;
+	scrollbar:                      false;
 }
 
 mainbox {

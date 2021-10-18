@@ -47,16 +47,6 @@ if [ ! -e $GTHEME_PATH ]; then
   exit 1
 fi
 
-if [ ! -e $ACTIVE_DESKTOP ]; then
-  echo -e "\n${R}[!]${W} There is no desktop selected! Create a symlink to a desktop folder in ${W_B}$DESKTOPS_PATH${W}.\n"
-  exit 1
-fi
-
-if [ ! -e $GTHEME_CURRENT_DESKTOP ]; then
-  echo -e "\n${R}[!]${W} Gtheme folder not found in the current desktop ${W_B}$(realpath $ACTIVE_DESKTOP)${W}!\n"
-  exit 1
-fi
-
 # •• Global Settings
 VSCODE_SETTINGS_FILE="$CONFIG/Code/User/settings.json"
 
@@ -480,23 +470,19 @@ function applyDesktop() {
   declare -r DESKTOP_NAME="$1"
   declare USER_FOLDER
 
-  echo -e "${B}•${W} Removing previous desktop folders...\n"
-  for folder in $ACTIVE_DESKTOP/.config/*; do
-    USER_FOLDER=$HOME/.config/$(basename $folder)
-    rm -rf $USER_FOLDER
-    echo -e "${B}•${W} Removed ${W_B}$USER_FOLDER${W}"
-  done
-  echo
+  if [ -e $ACTIVE_DESKTOP ]; then
+    echo -e "${B}•${W} Removing previous desktop folders...\n"
+    for folder in $ACTIVE_DESKTOP/.config/*; do
+      USER_FOLDER=$HOME/.config/$(basename $folder)
+      [ $USER_FOLDER != "$HOME/.config/"] rm -rf $USER_FOLDER
+      echo -e "${B}•${W} Removed ${W_B}$USER_FOLDER${W}"
+    done
+    echo
+  fi
 
   for folder in $DESKTOPS_PATH/$DESKTOP_NAME/.config/*; do
     echo -e "${B}•${W} Moving ${W_B}$(basename $folder)/${W}..."
-
-    [ $(basename $(realpath $ACTIVE_DESKTOP)) == "init" ] && cp -r $HOME/.config $BACKUP_PATH
-
-    USER_FOLDER=$HOME/.config/$(basename $folder)
-    [[ -e $USER_FOLDER && $(realpath $USER_FOLDER) != "$HOME/.config" ]] && rm -rf $USER_FOLDER
     cp -r $folder $HOME/.config
-
     echo -e "${G}• Done!${W}\n"
   done
 
