@@ -13,6 +13,7 @@ W_B="\e[1m"
 # •• Global variables
 SRC_PATH=$(realpath $(dirname $0))
 GTHEME_PATH=$HOME/.config/gtheme
+BACKUP_PATH=$GTHEME_PATH/backup
 
 function gthemeLogo() {
 	echo
@@ -30,6 +31,30 @@ function rollback() {
 	# [ -e /usr/bin/gtheme ] && sudo rm /usr/bin/gtheme &>/dev/null
 	# rm -rf $GTHEME_PATH &>/dev/null
 	exit 1
+}
+
+function backupConfig() {
+	[ ! -e $BACKUP_PATH ] && mkdir -p $BACKUP_PATH
+	echo -e "${G}•${W} Copying all your files. This may take a while..."
+	cp -r $HOME/.config $BACKUP_PATH
+	echo -e "${G}•${W} Backup done!\n"
+}
+
+function askBackup() {
+	while true; do
+		echo -en "${B}[!]${W} Do you want to make a backup? All your .config folder will be copied to ${W_B}$BACKUP_PATH${W} ${G}(y/n)${W} "
+		read INPUT
+		case $INPUT in 
+			y | Y) 
+				backupConfig
+				return 0;;
+			n | N)
+				echo -e "${R}•${W} Skipping backup creation...\n"
+				return 0;;
+			*)
+				echo -e "${R}•${W} Incorrect option!\n";;
+		esac
+	done
 }
 
 function copyFiles() {
@@ -51,7 +76,7 @@ function copyFiles() {
 		echo -e "${G}• Done!${W}\n"
 
 	else
-		echo -e "${Y}•${W} It looks like you have already installed gtheme. Skipping the main gtheme folder copy in ${W_B}$GTHEME_PATH"${W}...\n"
+		echo -e "${Y}•${W} It looks like you have already installed gtheme. Skipping the main gtheme folder copy in ${W_B}$GTHEME_PATH${W}...\n"
 	fi
 
 	echo -e "${G}•${W} Copying gtheme script to ${W_B}/usr/bin${W}..."
@@ -67,6 +92,7 @@ function main() {
 	echo
 	gthemeLogo
 	copyFiles
+	askBackup
 	
 	echo -e "${B}• Installation finished!${W}\n"
 	echo -e "${B}•${W} To get more information about its usage refer to the repo: ${B}https://github.com/daavidrgz/gtheme${W}"

@@ -72,14 +72,24 @@ globalkeys = gears.table.join(
         awful.spawn.easy_async_with_shell("pactl set-sink-volume @DEFAULT_SINK@ +2%",
         function() awesome.emit_signal("volume_") end)
     end, { description = "raise volume by 3%", group = "audio" }),
+
     awful.key({}, "XF86AudioLowerVolume", function()
         awful.spawn.easy_async_with_shell("pactl set-sink-volume @DEFAULT_SINK@ -2%",
         function() awesome.emit_signal("volume_refresh") end)
     end, {description = "lower volume by 3%", group = "audio"}),
+
     awful.key({}, "XF86AudioMute", function()
         awful.spawn.easy_async_with_shell("pactl set-sink-mute @DEFAULT_SINK@ toggle",
         function() awesome.emit_signal("volume_refresh") end)
     end, {description = "mute audio", group = "audio"}),
+    
+    awful.key({}, "XF86MonBrightnessUp", function()
+        awful.spawn.easy_async_with_shell("brightnessctl set +5%")
+    end, {description = "raise brightness by 5%", group = "brightness"}),
+
+    awful.key({}, "XF86MonBrightnessDown", function()
+        awful.spawn.easy_async_with_shell("brightnessctl set 5%-")
+    end, {description = "lower brightness by 5%", group = "brightness"}),
 
     -- Standard program
     awful.key({ modkey,           }, "Return", function () awful.spawn(terminal) end,
