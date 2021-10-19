@@ -13,7 +13,7 @@ W_B="\e[1m"
 # •• Global variables
 SRC_PATH=$(realpath $(dirname $0))
 GTHEME_PATH=$HOME/.config/gtheme
-BACKUP_PATH=$GTHEME_PATH/backup
+BACKUP_PATH=/etc/gtheme/backup
 
 function gthemeLogo() {
 	echo
@@ -34,25 +34,25 @@ function rollback() {
 }
 
 function backupConfig() {
-	[ ! -e $BACKUP_PATH ] && mkdir -p $BACKUP_PATH
-	echo -e "${G}•${W} Copying all your files. This may take a while..."
-	cp -r $HOME/.config $BACKUP_PATH
+	[ ! -e $BACKUP_PATH ] && sudo mkdir -p $BACKUP_PATH
+	echo -e "\n${G}•${W} Copying all your files. This may take a while..."
+	sudo cp -r $HOME/.config $BACKUP_PATH
 	echo -e "${G}•${W} Backup done!\n"
 }
 
 function askBackup() {
 	while true; do
-		echo -en "${B}[!]${W} Do you want to make a backup? All your .config folder will be copied to ${W_B}$BACKUP_PATH${W} ${G}(y/n)${W} "
+		echo -en "${B}[!]${W} Do you want to make a backup? All your ${W_B}$HOME/.config${W} folder will be copied to ${W_B}$BACKUP_PATH${W} ${G}(y/n)${W} "
 		read INPUT
 		case $INPUT in 
 			y | Y) 
 				backupConfig
 				return 0;;
 			n | N)
-				echo -e "${R}•${W} Skipping backup creation...\n"
+				echo -e "\n${R}•${W} Skipping backup creation...\n"
 				return 0;;
 			*)
-				echo -e "${R}•${W} Incorrect option!\n";;
+				echo -e "\n${R}•${W} Incorrect option!\n";;
 		esac
 	done
 }
@@ -80,7 +80,7 @@ function copyFiles() {
 	fi
 
 	echo -e "${G}•${W} Copying gtheme script to ${W_B}/usr/bin${W}..."
-	echo -e "${G}•${W} You must be root to proceed"
+	echo -e "${G}•${W} You must be root to proceed!"
 	if ! sudo cp $SRC_PATH/gtheme /usr/bin; then
 		echo -e "${R}[!]${W} There was an error while copying script to ${W_B}/usr/bin${W}\n"
 		rollback
@@ -95,9 +95,9 @@ function main() {
 	askBackup
 	
 	echo -e "${B}• Installation finished!${W}\n"
-	echo -e "${B}•${W} To get more information about its usage refer to the repo: ${B}https://github.com/daavidrgz/gtheme${W}"
+	echo -e "${B}•${W} To get more information about gtheme usage refer to the repo: ${B}https://github.com/daavidrgz/gtheme${W}"
 	echo -e "${B}•${W} Feel free to also check my dotfiles: ${B}https://github.com/daavidrgz/dotfiles${W}
-  (Provided patterns and post-scripts were made to perfectly work with them)\n\n"
+  (Provided patterns and post-scripts were made to perfectly work with them)\n"
 
 	exit 0
 }
