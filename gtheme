@@ -474,7 +474,7 @@ function applyDesktop() {
     echo -e "${B}•${W} Removing previous desktop folders...\n"
     for folder in $ACTIVE_DESKTOP/.config/*; do
       USER_FOLDER=$HOME/.config/$(basename $folder)
-      [ $USER_FOLDER != "$HOME/.config/"] rm -rf $USER_FOLDER
+      [ $USER_FOLDER != "$HOME/.config/" ] && rm -rf $USER_FOLDER
       echo -e "${B}•${W} Removed ${W_B}$USER_FOLDER${W}"
     done
     echo
