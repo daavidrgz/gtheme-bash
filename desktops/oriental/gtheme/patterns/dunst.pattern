@@ -10,9 +10,8 @@
                               
 [global]
 monitor = 0
-follow = keyboard
-# geometry = "350x400-850+420"
-geometry = "350x400-10+15"
+follow = mouse
+per_monitor_dpi = false
 indicate_hidden = no
 shrink = no
 transparency = 0
@@ -21,10 +20,14 @@ separator_height = 3
 padding = 10
 horizontal_padding = 20
 frame_width = 2
-frame_color = "#%red%"
+frame_color = "#%cyan%"
 separator_color = frame
 sort = no
 idle_threshold = 0
+
+### Position ###
+origin = top-right
+offset = 15x50
 
 ### Text ###
 
