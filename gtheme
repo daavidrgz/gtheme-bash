@@ -509,8 +509,8 @@ function applyDesktop() {
   fi
 
   echo -e "${B}•${W} Trying to execute ${W_B}$POSTSCRIPTS_PATH/desktop-exit.sh${W} to exit the wm...\n"
-  if [ -e $POSTSCRIPTS_PATH/desktop-restart.sh ]; then
-    $POSTSCRIPTS_PATH/desktop-restart.sh && return 0
+  if [ -e $POSTSCRIPTS_PATH/desktop-exit.sh ]; then
+    $POSTSCRIPTS_PATH/desktop-exit.sh && return 0
 
     echo -e "\n${R}[${W} Press any key to continue ${R}]${W}\n"
     keyInput &>/dev/null

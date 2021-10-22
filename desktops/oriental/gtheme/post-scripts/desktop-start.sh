@@ -1,4 +1,4 @@
 #!/bin/sh
 
-gtheme -n Rose-Pine-Dawn -vw
+gtheme -n Japan-Light -vw
 exit 0
