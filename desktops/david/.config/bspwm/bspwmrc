@@ -11,9 +11,9 @@
 ~/.fehbg
 
 # •• Polybar
-/home/david/.config/polybar/launch.sh
+~/.config/polybar/launch.sh
 
-pgrep -x sxhkd > /dev/null || sxhkd &
+pgrep -x sxhkd >/dev/null || sxhkd &
 
 bspc monitor -d I II III IV V VI VII VIII IX X
 
@@ -26,11 +26,10 @@ bspc config gapless_monocle      true
 
 bspc rule -a Zathura state=tiled
 
-bspc config pointer_motion_interval 5
-
 wmname LG3D
 
 # •• Keymap
 setxkbmap es
 
+# •• Compositor
 picom --experimental-backends &

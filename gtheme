@@ -77,7 +77,14 @@ function helpPanel() {
 }
 
 function setWallpaper() {
-  WALLPAPER_SCRIPT=$POSTSCRIPTS_PATH/wallpaper.sh
+  declare WALLPAPER_SCRIPT=$POSTSCRIPTS_PATH/wallpaper.sh
+  declare IS_THEMING="false"
+  declare IS_LIGHTDM="true"
+
+  if ls $ACTIVE_PATTERNS_PATH | grep -e "^wallpaper-theme.pattern$" &>/dev/null; then
+    echo -e "${B}•${W} Wallpaper theming detected!"
+    IS_THEMING="true"
+  fi
 
   if [ ! -e $WALLPAPER_SCRIPT ]; then
     echo -e "${R}[!]${W} The wallpaper script does not exist! Create a ${W_B}wallpaper.sh${W} under ${W_B}$POSTSCRIPTS_PATH${W}"
@@ -94,7 +101,7 @@ function setWallpaper() {
 
   WALLPAPER_REAL_PATH="$(echo $WALLPAPER | sed "s|~|$HOME|")"
 
-  if $WALLPAPER_SCRIPT "$WALLPAPER_REAL_PATH"; then
+  if $WALLPAPER_SCRIPT "$WALLPAPER_REAL_PATH" "$IS_LIGHTDM" "$IS_THEMING"; then
     echo -e "${B}[+]${W} Wallpaper ${W_B}$(basename $WALLPAPER)${W} applied!\n"
 
     sed -i "/.*wallpaper.*/d" $CURRENT_THEME_FILE
@@ -501,14 +508,14 @@ function applyDesktop() {
     echo -e "${R}[!]${W} There is no desktop start post-script, consider creating it to set a new theme on desktop change!\n"
   fi
 
-  echo -e "${B}•${W} Trying to execute ${W_B}$POSTSCRIPTS_PATH/desktop-restart.sh${W} to restart the wm...\n"
+  echo -e "${B}•${W} Trying to execute ${W_B}$POSTSCRIPTS_PATH/desktop-exit.sh${W} to exit the wm...\n"
   if [ -e $POSTSCRIPTS_PATH/desktop-restart.sh ]; then
     $POSTSCRIPTS_PATH/desktop-restart.sh && return 0
 
     echo -e "\n${R}[${W} Press any key to continue ${R}]${W}\n"
     keyInput &>/dev/null
   else
-    echo -e "${R}[!]${W} There is no desktop restart post-script, consider creating it to restart your wm!\n"
+    echo -e "${R}[!]${W} There is no desktop exit post-script, consider creating it to restart your wm!\n"
   fi
 }
 

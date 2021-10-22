@@ -1,0 +1,31 @@
+vscode: Rosé Pine Dawn
+
+background: faf4ed
+foreground: 3D495B
+cursor: 3D495B
+selection-background: 3D495B
+selection-foreground: faf4ed 
+
+black: 3D495B
+black-hg: 3D495B
+
+red: F7AA9D
+red-hg: F7AA9D
+
+green: D8E9A8
+green-hg: D8E9A8
+
+yellow: FFE699
+yellow-hg: FFE699
+
+blue: 9DB9C5
+blue-hg: 9DB9C5
+
+magenta: EBBDCB
+magenta-hg: EBBDCB
+
+cyan: C8D1E4
+cyan-hg: C8D1E4
+
+white: 3D495B
+white-hg: 3D495B

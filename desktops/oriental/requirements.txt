@@ -1,0 +1,15 @@
+-- Apps
+
+paperview (https://github.com/glouw/paperview)
+firefox
+kitty
+firejail
+flameshot
+pamixer
+birghtnessctl
+dunsitfy
+newsboat
+ 
+-- Fonts
+
+mononoki Nerd Font

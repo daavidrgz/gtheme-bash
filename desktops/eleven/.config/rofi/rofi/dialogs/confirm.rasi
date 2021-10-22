@@ -1,0 +1,40 @@
+/* Copyright (C) 2020-2021 Aditya Shakya <adi1090x@gmail.com> */
+/* Everyone is permitted to copy and distribute copies of this file under GNU-GPL3 */
+
+@import "colors.rasi"
+
+* {
+    background-color:       #FFFFFF;
+    text-color:             #1C1C1Aff;
+	font:				 	"Segoe UI Variable Medium 11";
+}
+
+window {
+    width:      			250px;
+    padding:                10px;
+    border:					0px 0px 2px 0px;
+    border-radius:          6px;
+    border-color:           #0061B7ff;
+    location:               center;
+    x-offset:               0;
+    y-offset:               -5%;
+}
+
+textbox-prompt-colon {
+	expand: 						false;
+	str: 							"";
+    padding:                        7px 10px 0px 10px;
+    font:                           "JetBrainsMono Nerd Font 11";
+}
+
+entry {
+    expand: 				true;
+    width: 					150px;
+    padding:                5px;
+}
+
+inputbar {
+	children: 				  [ textbox-prompt-colon, entry ];
+    spacing:                  0px;
+    position:                 center;
+}
