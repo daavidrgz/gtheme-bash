@@ -16,3 +16,5 @@ setxkbmap es
 # Compositor
 picom &
 
+# •• Key press rate
+xset r rate 200 40

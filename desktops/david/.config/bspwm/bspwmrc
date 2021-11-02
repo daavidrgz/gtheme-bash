@@ -33,3 +33,6 @@ setxkbmap es
 
 # •• Compositor
 picom --experimental-backends &
+
+# •• Key press rate
+xset r rate 200 40

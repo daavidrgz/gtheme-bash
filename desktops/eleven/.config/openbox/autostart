@@ -17,3 +17,6 @@ dunst &
 
 # •• Audio daemon
 mpd &
+
+# •• Key press rate
+xset r rate 200 40

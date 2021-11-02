@@ -1,2 +1,0 @@
-#!/bin/sh
-clipctl disable && pass -c $1 && clipctl enable

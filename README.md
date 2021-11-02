@@ -7,6 +7,9 @@ Based in patterns, Gtheme can generate any file applying one of the more than 35
 Thus, it can create and replace in real time a rofi colors.rasi file, an alacritty.yml file and so much more, leading
 to a global theme change perception that we all really need.
 
+**But that's not all...**  
+With the latest update, Gtheme can also raplace your config files with the ones provided delivering a one click desktop change and a plug and play experience ready to enjoy the script. You can also create and store your own desktops following the few rules described below.  
+
 It also supports:
 * Executing a post script to, for example, restart the dunst notification daemon or refresh the terminal colors with tput.
 * Changing the wallpaper to match your new color scheme.
@@ -31,6 +34,16 @@ cd gtheme
 
 ## Wiki
 
+### Desktops **(New)**
+
+* Every desktop is stored in the `desktops/` folder.
+
+* Inside, you'll find everything you need to get that desktop running fine. There must be:
+	* A `.config/` folder which will replace the user's config one.
+	* A `gtheme/` folder with the patterns and post-scripts to apply  
+
+	You can also store another files inside your desktop folder (gtheme will ignore them) like in [oriental](https://github.com/daavidrgz/gtheme/tree/master/desktops/oriental).
+
 ### Themes
 
 * All themes are stored in the `themes/` folder with the `.colors` extension.  
@@ -41,10 +54,10 @@ cd gtheme
 
 ### Patterns
 
-* All patterns are stored in the `patterns/` folder with the `.pattern` extension.  
+* All patterns are stored in the `desktops/{desktop_name}/patterns/` folder with the `.pattern` extension.  
 If you want to activate a pattern, just use the `-a` option in the program or create a symlink to the pattern in the `patterns/active-patterns/` folder.
 
-* ***Mandatory key***: `%output-file%=/output/path/file.extension`  
+* **Mandatory key**: `%output-file%=/output/path/file.extension`  
 It's required to know where to place the file generated, its name and extension.
 
 * Available keys: `%background%` `%foreground%` `%cursor%` `%selection-background%` `%selection-foreground%` `%black%` `%black-hg%` `%red%` `%red-hg%` `%green%` `%green-hg%` `%yellow%` `%yellow-hg%` `%blue%` `%blue-hg%` `%magenta%` `%magenta-hg%` `%cyan%` `%cyan-hg%` `%white%` `%white-hg%`.
@@ -53,20 +66,35 @@ It's required to know where to place the file generated, its name and extension.
 
 ### Post-Scripts
 
-* The scripts will be stored in the `post-scripts/` folder with the `.sh` extension.  
+* The scripts will be stored in the `desktops/{desktop_name}/post-scripts/` folder with the `.sh` extension.  
 
 * The script files **with the same name as the pattern** will be executed after the output file is generated.   
 
 * The created file's path is sent to all the scripts as its first argument (see [kitty.sh](https://github.com/daavidrgz/gtheme/tree/master/post-scripts/kitty.sh)). 
 
-* The `wallpaper.sh` is a special type of post-script that is called when there is a wallpaper specified in the theme (and the flag `-w` is passed).  
-	The first argument recieved by the script will be the new wallpaper's url (see [wallpaper.sh](https://github.com/daavidrgz/gtheme/tree/master/post-scripts/wallpaper.sh)).  
+* The `wallpaper.sh` is a special type of post-script that is called when there is a wallpaper specified in the theme.  
+	The first argument recieved by the script will be the new wallpaper's url; the second specifies if the wallpaper should be applied to your DM and the third where your wallpaper will be themed or no using [ImageTheming](https://github.com/daniel-seiler/ImageTheming). (see [wallpaper.sh](https://github.com/daavidrgz/gtheme/blob/master/desktops/david/gtheme/post-scripts/wallpaper.sh) for an example).  
 	Because of feh generates a script with the last wallpaper you set as background in `~/.fehbg`, you can now reference it to set the theme's wallpaper after
 	every boot.
 
+* There are also two new spacial scripts that gtheme tries to use with the last update.
+	* `desktop-start.sh`: It's executed every time a desktop is changed. You can set a default palette, wallpaper, etc... using it. A simple example:
+		```
+		#!/bin/sh
+		gtheme -n Snazzy -vw
+		```
+	* `desktop-exit.sh`: It's executed before the new desktop is applied and should not be empty.
+	You can use it to restart your WM. If you're using bspwm:
+		```
+		#!/bin/sh
+		bspc quit
+		exit $?
+		```
+
+
 ***
 
-### Examples
+### Examples using the "Simple" desktop
 
 ![Gif](screenshots/gif.gif)
 

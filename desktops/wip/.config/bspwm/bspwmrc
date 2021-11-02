@@ -32,9 +32,13 @@ wmname LG3D
 # •• Keymap
 setxkbmap es
 
+# •• Key press rate
+xset r rate 200 40
+
 # •• Apps
 picom --experimental-backends &
 
 $HOME/.config/xob/xob-start &
 $HOME/.config/tint2/tint2-start &
 udiskie &
+

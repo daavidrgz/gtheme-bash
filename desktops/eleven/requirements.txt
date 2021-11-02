@@ -12,6 +12,6 @@ firefox
 mpd
 dunst
 
--- Various
+-- Font
 
-Segoe UI font
+Segoe UI Variable (inluded)
