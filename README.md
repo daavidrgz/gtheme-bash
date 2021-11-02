@@ -30,6 +30,9 @@ cd gtheme
 ./install.sh
 ```
 
+After that you can now run `gtheme` and apply your first desktop.  
+**Keep in mind that your config files will be replaced. Make sure you have done a backup before proceeding!**
+
 ***
 
 ## Wiki
@@ -39,7 +42,7 @@ cd gtheme
 * Every desktop is stored in the `desktops/` folder.
 
 * Inside, you'll find everything you need to get that desktop running fine. There must be:
-	* A `.config/` folder which will replace the user's config one.
+	* A `.config/` folder which **will replace all the folders in common** with the user's config ones located in `$HOME/.config`.
 	* A `gtheme/` folder with the patterns and post-scripts to apply  
 
 	You can also store another files inside your desktop folder (gtheme will ignore them) like in [oriental](https://github.com/daavidrgz/gtheme/tree/master/desktops/oriental).
