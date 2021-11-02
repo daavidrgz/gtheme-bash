@@ -76,11 +76,11 @@ It's required to know where to place the file generated, its name and extension.
 * The created file's path is sent to all the scripts as its first argument (see [kitty.sh](https://github.com/daavidrgz/gtheme/tree/master/desktops/simple/gtheme/post-scripts/kitty.sh)). 
 
 * The `wallpaper.sh` is a special type of post-script that is called when there is a wallpaper specified in the theme.  
-	The first argument recieved by the script will be the new wallpaper's url; the second specifies if the wallpaper should be applied to your DM and the third whether your wallpaper will be themed or no using [ImageTheming](https://github.com/daniel-seiler/ImageTheming). (see [wallpaper.sh](https://github.com/daavidrgz/gtheme/blob/master/desktops/david/gtheme/post-scripts/wallpaper.sh) for an example).  
+	The first argument recieved by the script will be the new wallpaper's url; the second specifies if the wallpaper should be applied to your DM and the third whether your wallpaper will be themed or no using [ImageTheming](https://github.com/daniel-seiler/ImageTheming). (see [wallpaper.sh](https://github.com/daavidrgz/gtheme/blob/master/desktops/simple/gtheme/post-scripts/wallpaper.sh) for an example).  
 	Because of feh generates a script with the last wallpaper you set as background in `~/.fehbg`, you can now reference it to set the theme's wallpaper after
 	every boot.
 
-* There are also two new spacial scripts that gtheme tries to use with the last update.
+* There are also two new special scripts that gtheme tries to use with the last update.
 	* `desktop-start.sh`: It's executed every time a desktop is changed. You can set a default palette, wallpaper, etc... using it. A simple example:
 		```
 		#!/bin/sh
