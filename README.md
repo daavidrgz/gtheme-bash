@@ -45,7 +45,7 @@ After that you can now run `gtheme` and apply your first desktop.
 	* A `.config/` folder which **will replace all the folders in common** with the user's config ones located in `$HOME/.config`.
 	* A `gtheme/` folder with the patterns and post-scripts to apply  
 
-	You can also store another files inside your desktop folder (gtheme will ignore them) like in [oriental](https://github.com/daavidrgz/gtheme/tree/master/desktops/oriental).
+	You can also store another files inside your desktop folder (gtheme will ignore them) like in [japan](https://github.com/daavidrgz/gtheme/tree/master/desktops/japan).
 
 ### Themes
 
