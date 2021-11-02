@@ -73,7 +73,7 @@ It's required to know where to place the file generated, its name and extension.
 
 * The script files **with the same name as the pattern** will be executed after the output file is generated.   
 
-* The created file's path is sent to all the scripts as its first argument (see [kitty.sh](https://github.com/daavidrgz/gtheme/tree/master/post-scripts/kitty.sh)). 
+* The created file's path is sent to all the scripts as its first argument (see [kitty.sh](https://github.com/daavidrgz/gtheme/tree/master/desktops/simple/gtheme/post-scripts/kitty.sh)). 
 
 * The `wallpaper.sh` is a special type of post-script that is called when there is a wallpaper specified in the theme.  
 	The first argument recieved by the script will be the new wallpaper's url; the second specifies if the wallpaper should be applied to your DM and the third where your wallpaper will be themed or no using [ImageTheming](https://github.com/daniel-seiler/ImageTheming). (see [wallpaper.sh](https://github.com/daavidrgz/gtheme/blob/master/desktops/david/gtheme/post-scripts/wallpaper.sh) for an example).  
