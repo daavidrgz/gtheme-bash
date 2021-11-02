@@ -58,7 +58,7 @@ After that you can now run `gtheme` and apply your first desktop.
 ### Patterns
 
 * All patterns are stored in the `desktops/{desktop_name}/patterns/` folder with the `.pattern` extension.  
-If you want to activate a pattern, just use the `-a` option in the program or create a symlink to the pattern in the `patterns/active-patterns/` folder.
+If you want to activate a pattern, just use the `-a` option in the program or create a symlink to the pattern in the `desktops/{desktop_name}/patterns/active-patterns/` folder.
 
 * **Mandatory key**: `%output-file%=/output/path/file.extension`  
 It's required to know where to place the file generated, its name and extension.
