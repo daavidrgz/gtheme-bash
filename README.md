@@ -31,7 +31,7 @@ cd gtheme
 ```
 
 After that you can now run `gtheme` and apply your first desktop.  
-**Keep in mind that your config files will be replaced. Make sure you have done a backup before proceeding!**
+**Keep in mind that some of your config files will be replaced. Make sure you have done a backup before proceeding!**
 
 ***
 
