@@ -11,7 +11,7 @@ function run {
 ~/.fehbg
 
 # Resolution
-setxkbmap es
+setxkbmap -layout us -variant altgr-intl
 
 # Compositor
 picom &

@@ -1,4 +1,4 @@
-#  -------- Gtheme: Everforest-Dark-Hard --------
+#  -------- Gtheme: Gruvbox-Light --------
 
 # ██████╗ ██╗   ██╗███╗   ██╗███████╗████████╗
 # ██╔══██╗██║   ██║████╗  ██║██╔════╝╚══██╔══╝
@@ -16,8 +16,6 @@ monitor = 0
 
 follow = mouse
 
-per_monitor_dpi = false
-
 #----------------------
 #   GENERAL
 #----------------------
@@ -34,31 +32,27 @@ browser = /usr/bin/firefox
 
 always_run_script = true
 
-startup_notification = false
-
-verbosity = mesg
-
 force_xinerama = false
 
 #----------------------
 #   FRAME
 #----------------------
 
-geometry = "320x480-11+32"
+width = 300
+height = 300
 corner_radius = 6
 
 shrink = no
 
 transparency = 0
 
-notification_height = 0
 separator_height = 2
 line_height = 4
 padding = 12
 horizontal_padding = 20
 frame_width = 0
 
-frame_color = "#a7c080"
+frame_color = "#98971a"
 separator_color = frame
 
 sort = yes
@@ -73,7 +67,7 @@ progress_bar_frame_width = 0
 #   FORMAT
 #----------------------
 
-font = DejaVuSansMono Nerd Font Medium 11
+font = DejaVuSansMono Nerd Font Medium 9
 
 markup = full
 
@@ -98,7 +92,7 @@ text_icon_padding = 0
 min_icon_size = 32
 max_icon_size = 40
 
-icon_path = /usr/share/icons/Papirus/64x64/apps
+icon_path = /usr/share/icons/Papirus/64x64/mimetypes
 
 #----------------------
 #   HISTORY
@@ -121,23 +115,23 @@ mouse_right_click = close_current
 #----------------------
 
 [urgency_low]
-background = "#2b3339"
-foreground = "#d3c6aa"
-highlight = "#83c092"
+background = "#fbf1c7"
+foreground = "#3c3836"
+highlight = "#689d6a"
 timeout = 5
 icon = /usr/share/icons/Papirus/48x48/emblems/emblem-information.svg
 
 [urgency_normal]
-background = "#2b3339"
-foreground = "#d3c6aa"
-highlight = "#83c092"
+background = "#fbf1c7"
+foreground = "#3c3836"
+highlight = "#689d6a"
 timeout = 5
 icon = /usr/share/icons/Papirus/48x48/emblems/emblem-information.svg
 
 [urgency_critical]
-background = "#2b3339"
-foreground = "#d3c6aa"
-highlight = "#e67e80"
+background = "#fbf1c7"
+foreground = "#3c3836"
+highlight = "#cc241d"
 timeout = 5
 icon = /usr/share/icons/Papirus/48x48/emblems/emblem-important.svg
 

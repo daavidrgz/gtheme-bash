@@ -33,13 +33,13 @@ ctrl + super + c
     ~/.config/rofi/calculator/calculator.sh
 
 ctrl + super + f
-    firejail firefox
+    firefox
 
 alt + Escape
     ~/.config/rofi/powermenu/powermenu.sh
 
 ctrl + super + o
-    kitty --hold -e rclone sync -P OneDrive:Música/Canciones\ Hi-Res ~/Music
+    kitty --hold -e rclone sync -P OneDrive:Música/Canciones\ Hi-Res ~/music
 
 #----------------------
 #   BSPWM
@@ -160,8 +160,8 @@ XF86MonBrightness{Up,Down}
 	brightnessctl set {+5%,5%-} && dunstify -a System -t 1000 -h string:x-dunst-stack-tag:volume -h int:value:$(brightnessctl info | grep "Current brightness" | sed 's/.*\((.*)\).*/\1/g' | tr -d '()%') "Brightness: $(brightnessctl info | grep "Current brightness" | sed 's/.*\((.*)\).*/\1/g' | tr -d '()')"
 
 Print
-    flameshot full -c -p ~/Pictures/Screenshots
+    flameshot full -c -p ~/pictures/screenshots
 
 super + Print
-    flameshot gui -p ~/Pictures/Screenshots
+    flameshot gui -p ~/pictures/screenshots
     

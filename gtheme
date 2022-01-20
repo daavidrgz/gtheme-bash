@@ -212,7 +212,7 @@ function generateFiles() {
   for PATTERN in $PATTERNS; do
     echo "$INVERTED_PATTERNS" | grep $PATTERN &>/dev/null
 
-    fillPattern $PATTERN $THEME_NAME $? || return 1
+    fillPattern "$PATTERN" "$THEME_NAME" "$?" || return 1
 
     sed -i "/$PATTERN:.*/d" $CURRENT_THEME_FILE
     echo -e "$PATTERN: $THEME_NAME" >> $CURRENT_THEME_FILE
@@ -524,7 +524,7 @@ function applyTheme() {
   gthemeLogo
   echo -e "\n${B}Applying $1...${W}\n"
   
-  generateFiles "$1" "" "${INVERTED_PATTERNS[@]}" && return
+  generateFiles "$1" "" "${INVERTED_PATTERNS[*]}" && return
 
   echo -e "\n${R}[${W} Press any key to continue ${R}]${W}\n"
   keyInput &>/dev/null

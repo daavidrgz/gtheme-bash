@@ -33,13 +33,13 @@ super + Escape
 #   /home/david/.config/rofi/calculator/calculator.sh
 
 ctrl + super + f
-    firejail firefox
+    firefox
 
 alt + Escape
     $HOME/.config/rofi/powermenu
 
 ctrl + super + o
-    kitty --hold -e rclone sync -P OneDrive:Música/Canciones\ Hi-Res /home/david/Music
+    kitty --hold -e rclone sync -P OneDrive:Música/Canciones\ Hi-Res ~/music
 
 #----------------------
 #   BSPWM
@@ -160,8 +160,8 @@ XF86MonBrightness{Up,Down}
 	brightnessctl set {+5%,5%-}
 
 Print
-    flameshot full -c -p /home/david/Pictures/Screenshots
+    flameshot full -c -p ~/pictures/screenshots
 
 super + Print
-    flameshot gui -p /home/david/Pictures/Screenshots
+    flameshot gui -p ~/pictures/screenshots
     

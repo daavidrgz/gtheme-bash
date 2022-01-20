@@ -32,6 +32,9 @@ line-size = 6
 border-top-size = 2
 border-color = ${color.magenta}
 
+monitor = HDMI-0
+monitor-fallback = DP-2
+
 wm-restack = bspwm
 module-margin-left = 1
 

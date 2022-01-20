@@ -80,11 +80,11 @@ element {
 element-text {
     background-color: 				#00000000;
     text-color:       				inherit;
-    font:							"feather 64";
+    font:							"feather 50";
     expand:                         true;
     horizontal-align:               0.5;
     vertical-align:                 0.5;
-    margin:                         6.5% 4% 6.5% 4%;
+    margin:                         6.5% 3.5% 6.5% 3.5%;
 }
 
 element normal.urgent,
