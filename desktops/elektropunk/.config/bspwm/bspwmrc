@@ -27,8 +27,6 @@ bspc config gapless_monocle      false
 
 bspc rule -a Zathura state=tiled
 
-wmname LG3D
-
 # •• Colors
 bspc config normal_border_color "#ee00ff"
 bspc config active_border_color "#38369C"

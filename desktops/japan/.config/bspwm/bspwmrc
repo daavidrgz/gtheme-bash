@@ -20,8 +20,6 @@ bspc rule -a mpv state=floating
 bspc rule -a Sxiv state=floating
 bspc rule -a Zathura state=tiled
 
-wmname LG3D
-
 # •• Keymap
 setxkbmap -layout us -variant altgr-intl
 

@@ -28,8 +28,6 @@ bspc config gapless_monocle      true
 bspc rule -a Zathura state=tiled
 bspc rule -a Rofi state=floating
 
-wmname LG3D
-
 # •• Keymap
 setxkbmap -layout us -variant altgr-intl
 

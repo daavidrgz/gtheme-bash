@@ -42,14 +42,31 @@ function backupConfig() {
 
 function askBackup() {
 	while true; do
-		echo -en "${B}[!]${W} Do you want to make a backup? All your ${W_B}$HOME/.config${W} folder will be copied to ${W_B}$BACKUP_PATH${W} ${G}(y/n)${W} "
+		echo -en "${B}[!]${W} Do you want to make a backup? All your ${W_B}$HOME/.config${W} folder will be copied to ${W_B}$BACKUP_PATH${W} ${G}(y/[n])${W} "
 		read INPUT
 		case $INPUT in 
 			y | Y) 
 				backupConfig
 				return 0;;
+			n | N | "")
+				echo -e "\n${Y}•${W} Skipping backup creation...\n"
+				return 0;;
+			*)
+				echo -e "\n${R}•${W} Incorrect option!\n";;
+		esac
+	done
+}
+
+function askCopy() {
+	while true; do
+		echo -en "${Y}[!]${W} It looks like you have already installed gtheme. Do you want to reinstall it? ${G}([y]/n)${W} "
+		read INPUT
+		case $INPUT in 
+			y | Y | "") 
+				copyFiles
+				return 0;;
 			n | N)
-				echo -e "\n${R}•${W} Skipping backup creation...\n"
+				echo -e "\n${Y}•${W} Skipping files copy...\n"
 				return 0;;
 			*)
 				echo -e "\n${R}•${W} Incorrect option!\n";;
@@ -58,25 +75,28 @@ function askBackup() {
 }
 
 function copyFiles() {
+	echo -e "${G}•${W} Creating main gtheme folder in ${W_B}$GTHEME_PATH${W}..."
+	mkdir $GTHEME_PATH &>/dev/null
+
+	for FOLDER in ${GTHEME_FOLDERS[@]}; do
+		echo -e "${G}•${W} Transfering ${W_B}$FOLDER${W}..."
+		if ! cp -r $SRC_PATH/$FOLDER/ $GTHEME_PATH/$FOLDER; then
+			echo -e "${R}[!]${W} There was an error while transfering ${W_B}$SRC_PATH/$FOLDER/${W}!\n"
+			rollback
+		fi
+
+		[ "$FOLDER" == "themes" ] && mkdir $GTHEME_PATH/$FOLDER/fav-themes
+	done
+	echo -e "${G}• Done!${W}\n"	
+}
+
+function install() {
 	declare -a GTHEME_FOLDERS=("themes" "patterns" "post-scripts" "wallpapers")
 
-	if [ ! -e "$GTHEME_PATH" ]; then
-		echo -e "${G}•${W} Creating main gtheme folder in ${W_B}$GTHEME_PATH${W}..."
-		mkdir $GTHEME_PATH &>/dev/null
-
-		for FOLDER in ${GTHEME_FOLDERS[@]}; do
-			echo -e "${G}•${W} Transfering ${W_B}$FOLDER${W}..."
-			if ! cp -r $SRC_PATH/$FOLDER/ $GTHEME_PATH/$FOLDER; then
-				echo -e "${R}[!]${W} There was an error while transfering ${W_B}$SRC_PATH/$FOLDER/${W}!\n"
-				rollback
-			fi
-
-			[ "$FOLDER" == "themes" ] && mkdir $GTHEME_PATH/$FOLDER/fav-themes
-		done
-		echo -e "${G}• Done!${W}\n"
-
+	if [ -e "$GTHEME_PATH" ]; then
+		askCopy
 	else
-		echo -e "${Y}•${W} It looks like you have already installed gtheme. Skipping the main gtheme folder copy in ${W_B}$GTHEME_PATH${W}...\n"
+		copyFiles
 	fi
 
 	echo -e "${G}•${W} Copying gtheme script to ${W_B}/usr/bin${W}..."
@@ -91,13 +111,12 @@ function copyFiles() {
 function main() {
 	echo
 	gthemeLogo
-	copyFiles
+	install
 	askBackup
 	
 	echo -e "${B}• Installation finished!${W}\n"
 	echo -e "${B}•${W} To get more information about gtheme usage refer to the repo: ${B}https://github.com/daavidrgz/gtheme${W}"
-	echo -e "${B}•${W} Feel free to also check my dotfiles: ${B}https://github.com/daavidrgz/dotfiles${W}
-  (Provided patterns and post-scripts were made to perfectly work with them)\n"
+	echo -e "${B}•${W} Feel free to also check my dotfiles: ${B}https://github.com/daavidrgz/dotfiles${W}\n"
 
 	exit 0
 }
