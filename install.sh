@@ -101,7 +101,7 @@ function install() {
 
 	echo -e "${G}•${W} Copying gtheme script to ${W_B}/usr/bin${W}..."
 	echo -e "${G}•${W} You must be root to proceed!"
-	if ! sudo cp $SRC_PATH/gtheme /usr/bin; then
+	if ! sudo cp $SRC_PATH/gtheme.sh /usr/bin; then
 		echo -e "${R}[!]${W} There was an error while copying script to ${W_B}/usr/bin${W}\n"
 		rollback
 	fi
