@@ -1,1 +1,2 @@
-desktops/* linguist-vendored
+* linguist-vendored
+*.sh linguist-vendored=false
