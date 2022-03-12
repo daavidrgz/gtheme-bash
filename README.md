@@ -109,6 +109,7 @@ Wallpaper repositories:
 * https://github.com/linuxdotexe/nordic-wallpapers
 * https://github.com/dracula/wallpaper
 * https://gitlab.com/exorcist365/wallpapers
+* https://github.com/catppuccin/wallpapers
 
 ## Notes
 
