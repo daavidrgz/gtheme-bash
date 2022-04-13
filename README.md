@@ -1,4 +1,6 @@
-# Gtheme
+# This project is discontinued. Check out the Rust version: [Gtheme](https://github.com/daavidrgz/gtheme)
+
+## Gtheme
 A bash script that makes your theming life so much easier 🎨.
 
 ## What is this?
